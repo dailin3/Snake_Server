@@ -1,0 +1,7 @@
+cmake-build-debug
+
+thirdparty
+
+.idea
+
+.DS_Store
