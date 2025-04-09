@@ -18,6 +18,7 @@ enum class InfoType {
     GameOperation = 1,          // to do game operation
     RoomOperation = 2,          // to start game or join room and so on
     RoomKeeperOperation = 3,    // to create room or delete room and so on
+    OtherOperation = 4,
 };
 
 class ReceivedInfo {
@@ -55,6 +56,21 @@ private:
     int playerId;
     json payload;
     const websocket::stream<asio::ip::tcp::socket>* ws;
+};
+
+class SendInfo {
+public:
+    SendInfo(std::vector<websocket::stream<asio::ip::tcp::socket>*> _object_list, json _payload) : object_list(_object_list), payload(_payload) {}
+
+    [[nodiscard]] std::vector<websocket::stream<asio::ip::tcp::socket>*> getObjectList() const {
+        return object_list;
+    }
+    [[nodiscard]] json getPayload() const {
+        return payload;
+    }
+private:
+    std::vector<websocket::stream<asio::ip::tcp::socket>*> object_list;
+    json payload;
 };
 
 #endif //INFO_H

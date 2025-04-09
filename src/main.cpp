@@ -1,6 +1,7 @@
 #include "Proxy.h"
 
-std::queue<ReceivedInfo> Proxy::infoQueue;
+std::queue<ReceivedInfo> Proxy::receivedQueue;
+std::queue<SendInfo> Proxy::sendQueue;
 
 int main() {
     asio::io_context io;

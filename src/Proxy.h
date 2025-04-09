@@ -21,7 +21,8 @@ using json = nlohmann::json;
 
 class Proxy {
     public:
-    static std::queue<ReceivedInfo> infoQueue;
+    static std::queue<ReceivedInfo> receivedQueue;
+    static std::queue<SendInfo> sendQueue;
 
     Proxy(asio::io_context& _io_context, const unsigned short _port) : acceptor(_io_context,{asio::ip::tcp::v4(),_port}), io_context(_io_context) {}
 
@@ -31,16 +32,36 @@ class Proxy {
                 // handle receive message
                 asio::ip::tcp::socket socket(io_context);
                 acceptor.accept(socket);
+                // Confused: why have to write in such format?
                 std::thread([this](asio::ip::tcp::socket s){this->_websocket_session(std::move(s));}, std::move(socket)).detach();
 
-                // handle send message
-                // TODO: add message send function
+                // clear the send message list
+                if (!sendQueue.empty()) {
+                    SendInfo sendInfo = sendQueue.front();
+                    send(sendInfo);
+                    sendQueue.pop();
+                }
+                // clear the received message list
+                if (!receivedQueue.empty()) {
+                    ReceivedInfo receivedInfo = receivedQueue.front();
+                    distributeInfo(receivedInfo);
+                    receivedQueue.pop();
+                }
             }
         }
     }
 
     void start() {isRunning = true;}
     void stop() {isRunning = false;}
+
+    void send(SendInfo& info) {
+        auto objlst = info.getObjectList();
+        for (auto obj : objlst) {
+            obj -> write(asio::buffer(info.getPayload().dump()));
+        }
+    }
+
+    void distributeInfo(ReceivedInfo& info){}  // TODO: to distribute the received info to other queue
 
     private:
     bool isRunning = true;
@@ -51,8 +72,7 @@ class Proxy {
         bool isGoodInfo = true; // TODO: think about whether the json is in right form and complete it.
         if (isGoodInfo) {
             const ReceivedInfo info{jsonInfo, ws};
-            infoQueue.push(info);
-            std::cout << infoQueue.front().getPayload().dump() << std::endl;
+            receivedQueue.push(info);
         }
     }
 
@@ -70,7 +90,7 @@ class Proxy {
                 // parse the json result and give the feedback.
                 try {
                     json j = json::parse(msg);
-                    std::cout << j.dump() << std::endl;
+                    std::cout << "WS_Session Received:" <<j.dump() << std::endl;
                     _handleInfo(j, &ws);
                 }
                 catch (const json::parse_error& e) {

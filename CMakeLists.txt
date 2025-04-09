@@ -11,8 +11,6 @@ include_directories(${BOOST_INCLUDE} ${JSON_INCLUDE} include/)
 add_executable(SnakeServer src/main.cpp
         src/Room.cpp
         src/Room.h
-        src/GameLogic.cpp
-        src/GameLogic.h
         src/GameItems.cpp
         src/GameItems.h
         src/RoomKeeper.cpp
@@ -21,4 +19,6 @@ add_executable(SnakeServer src/main.cpp
         src/Proxy.h
         src/Player.cpp
         src/Player.h
-        include/Info.h)
+        include/Info.h
+        src/GameThread.cpp
+        src/GameThread.h)
