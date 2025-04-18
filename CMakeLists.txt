@@ -21,4 +21,13 @@ add_executable(SnakeServer src/main.cpp
         src/Player.h
         include/Info.h
         src/GameThread.cpp
-        src/GameThread.h)
+        src/GameThread.h
+        src/GameObject.cpp
+        src/GameObject.h
+        src/Barrier.cpp
+        src/Barrier.h
+        src/Snake.cpp
+        src/Snake.h
+        src/Food.cpp
+        src/Food.h
+)

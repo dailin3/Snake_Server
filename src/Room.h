@@ -4,9 +4,12 @@
 
 #ifndef ROOM_H
 #define ROOM_H
-#include "GameItems.h"
-#include "GameThread.h"
-#include "Player.h"
+
+#include <iostream>
+
+#include "Info.h"
+class GameThread;
+class Player;
 
 enum class RoomState {
     Playing,
@@ -24,8 +27,8 @@ public:
         return state;
     }
 
-    [[nodiscard]] GameThread getGameThread() const {
-        return thread;
+    [[nodiscard]] GameThread* getGameThread() const {
+        return gameThread;
     }
 
     std::vector<ReceivedInfo> getOperationsList() {
@@ -56,7 +59,7 @@ private:
     int roomId;
     RoomState state;
     std::vector<Player*> players;
-    GameThread thread;
+    GameThread* gameThread;
     // TODO: create a new operation instance queue which replaces playerID with player pointer.
     std::queue<ReceivedInfo> operationsQueue;
 };

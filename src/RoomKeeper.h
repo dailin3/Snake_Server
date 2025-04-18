@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Player.h"
+#include "GameThread.h"
 
 
 class RoomKeeper {

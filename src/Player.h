@@ -7,7 +7,8 @@
 #include <string>
 
 #include "Proxy.h"
-#include "Room.h"
+
+class Room;
 
 enum class PlayerState {
     Playing = 1,
@@ -49,7 +50,5 @@ private:
     const websocket::stream<asio::ip::tcp::socket>* ws;
     Room* room;
 };
-
-
 
 #endif //PLAYER_H
