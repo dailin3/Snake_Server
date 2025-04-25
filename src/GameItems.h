@@ -5,45 +5,47 @@
 #ifndef GAMEITEMS_H
 #define GAMEITEMS_H
 
-#include <memory>
 #include <iostream>
 
-#include "Food.h"
 
-class Food;
-class Snake;
-class Barrier;
 class Map;
+class Point;
+class Food;
+class Barrier;
+class Snake;
+class GameObject;
 
 class GameItems {
 public:
     int frame = 0;
-    GameItems();
+    GameItems(Map* map);
     ~GameItems();
 
-    const std::vector<std::unique_ptr<Snake>>& getSnakes() const {
-         return snakes;
-    };
+    const std::vector<std::shared_ptr<Snake>>& getSnakes() const;
 
-    std::vector<std::unique_ptr<Barrier>>& getBarriers() {
-        return barriers;
-    };
+    std::vector<std::shared_ptr<Barrier>>& getBarriers();
 
-    std::vector<std::unique_ptr<Food>>& getFoods() {
-        return foods;
-    }
+    std::vector<std::shared_ptr<Food>>& getFoods();
 
-    void addFood(Food& food) {
-        foods.push_back(std::make_unique<Food>(food));
-    }
+    void addFood(Point point, int foodScore = 100);
+
+    void addSnake(Point point);
+
+    void addBarrier(Point point);
+
+    void removeSnakeById(int id);
+
+    void drawItems();
 
 private:
     Map* map;
-    std::vector<std::unique_ptr<Snake>> snakes;
-    std::vector<std::unique_ptr<Food>> foods;
-    std::vector<std::unique_ptr<Barrier>> barriers;
+    std::vector<std::shared_ptr<Snake>> snakes;
+    std::vector<std::shared_ptr<Food>> foods;
+    std::vector<std::shared_ptr<Barrier>> barriers;
 };
 
+#include "Food.h"
+#include "Snake.h"
+#include "Barrier.h"
 
-
-#endif //GAMEITEMS_H
+#endif // GAMEITEMS_H

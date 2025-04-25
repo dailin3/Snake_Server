@@ -6,51 +6,44 @@
 #define GAMEOBJECT_H
 
 #include <iostream>
+
 class GameItems;
+
+
+class Point {
+public:
+    Point(const int _x, const int _y);
+    Point up() const;
+    Point down() const;
+    Point left() const;
+    Point right() const;
+
+    bool operator==(const Point& other) const;
+
+    int x,y=0;
+};
 
 enum class Direction {
     up=0, down=1, left=2, right=3
 };
 
-class Point {
-public:
-    Point(const int _x, const int _y) : x(_x), y(_y) {}
-    Point up() const { return Point(x, y+1); }
-    Point down() const { return Point(x, y-1); }
-    Point left() const { return Point(x-1, y); }
-    Point right() const { return Point(x+1, y); }
-
-    bool operator==(const Point& other) const {
-        return x == other.x && y == other.y;
-    }
-
-private:
-    int x,y=0;
+// void =0;
+enum class ObjectType {
+    snake = 1,
+    food = 2,
+    barrier = 3,
 };
 
 class GameObject {
 public:
-    GameObject(GameItems* _gameItems ,std::string _type, const std::vector<Point> &_points): allItems(_gameItems),type(std::move(_type)), points(_points) {}
-    std::vector<Point> getPoints() {
-        return points;
-    };
-private:
-    std::string type;
+    static int maxId;
+
+    GameObject(GameItems* _gameItems ,ObjectType _type, const std::vector<Point> _points);
+
     std::vector<Point> points;
-    GameItems* allItems;
+    int id;
+    ObjectType type;
+    GameItems* gameItems;
 };
-
-class Cell {
-private:
-    Point position;
-    std::vector<GameObject*> objects;
-};
-
-class Map {
-private:
-    std::array<std::array<Cell, 128>, 128> map;
-};
-
-#include "GameItems.h"
 
 #endif //GAMEOBJECT_H

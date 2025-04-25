@@ -7,11 +7,9 @@
 
 #include "GameObject.h"
 
-
 class Barrier : public GameObject {
-
+public:
+    Barrier(GameItems* gameItems, Point point);
 };
 
-
-
-#endif //BARRIER_H
+#endif // BARRIER_H

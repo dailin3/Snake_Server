@@ -3,3 +3,7 @@
 //
 
 #include "Barrier.h"
+
+Barrier::Barrier(GameItems* gameItems, Point point)
+    : GameObject(gameItems, ObjectType::barrier, {point}) {
+}

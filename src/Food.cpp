@@ -3,3 +3,7 @@
 //
 
 #include "Food.h"
+
+Food::Food(GameItems* gameItems, Point point, int foodScore)
+    : foodScore(foodScore), GameObject(gameItems, ObjectType::food,{point}) {
+}

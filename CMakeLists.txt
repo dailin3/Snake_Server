@@ -30,4 +30,7 @@ add_executable(SnakeServer src/main.cpp
         src/Snake.h
         src/Food.cpp
         src/Food.h
+        src/main.h
+        src/Map.cpp
+        src/Map.h
 )

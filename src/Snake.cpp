@@ -3,3 +3,119 @@
 //
 
 #include "Snake.h"
+
+Snake::Snake(GameItems* gameItems, Point point)
+    : header(point), GameObject(gameItems, ObjectType::snake, {point}) {
+    direction = Direction::down;
+    snakeLength = 10;
+}
+
+void Snake::changeDirection(Direction _direction) {
+    this->direction = _direction;
+}
+
+void Snake::move() {
+    points.pop_back();  // delete the last element
+    switch (this->direction) {
+
+        // create new header
+        case Direction::up:
+            header = header.up();
+            break;
+        case Direction::down:
+            header = header.down();
+            break;
+        case Direction::left:
+            header = header.left();
+            break;
+        case Direction::right:
+            header = header.right();
+            break;
+    }
+
+    points.insert(points.begin(), header); // add header to first
+}
+
+void Snake::grow(int length) {
+    this->snakeLength += length;
+    auto tailDirection = Direction::up;
+    auto addPoint = *(points.rbegin());
+
+    // judge the tail direction
+    if (points.size() > 1) {
+        auto lastPoint = *(points.rbegin());
+        auto secondLastPoint = *(points.rbegin() + 1);
+        int dx = lastPoint.x - secondLastPoint.x;
+        int dy = lastPoint.y - secondLastPoint.y;
+        if (dx==1) tailDirection = Direction::right;
+        else if (dx==-1) tailDirection = Direction::left;
+        else if (dy==1) tailDirection = Direction::down;
+        else if (dy==-1) tailDirection = Direction::up;
+    }
+    switch (tailDirection) {
+        // create new header
+        case Direction::up:
+            addPoint = addPoint.up();
+            break;
+        case Direction::down:
+            addPoint = addPoint.down();
+            break;
+        case Direction::left:
+            addPoint = addPoint.left();
+            break;
+        case Direction::right:
+            addPoint = addPoint.right();
+            break;
+    }
+
+    points.insert(points.end(), addPoint); // add header to first
+}
+
+void Snake::dead() {
+    for (auto point : points) {
+        gameItems->addFood(point, 100);
+    }
+    gameItems->removeSnakeById(id);
+}
+
+void Snake::judge() {
+    // snake to snake
+    for (auto& snake : gameItems->getSnakes()) {
+        if (snake.get() != this) {    // if the snake is not this snake self
+            for (Point point : snake->points) {
+                if (header == point) {  // if collision happens
+                    this->setStatus(SnakeStatus::dead);
+                }
+            }
+        }
+    }
+
+    // snake to wall
+    for (auto& barrier : gameItems->getBarriers()) {
+        for (Point point : barrier->points) {
+            if (header == point) {
+                this->setStatus(SnakeStatus::dead);
+            }
+        }
+    }
+
+    // snake to food
+    for (auto& food : gameItems->getFoods()) {
+        for (Point point : food->points) {
+            if (header == point) {
+                this->setStatus(SnakeStatus::grow);
+            }
+        }
+    }
+}
+
+void Snake::react() {
+    if (snakeStatus == SnakeStatus::alive) return;
+    if (snakeStatus == SnakeStatus::dead) dead();
+    if (snakeStatus == SnakeStatus::grow) grow();
+}
+
+Snake::SnakeStatus Snake::setStatus(const SnakeStatus status) {
+    this->snakeStatus = status;
+    return snakeStatus;
+}

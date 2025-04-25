@@ -8,12 +8,11 @@
 #include "GameObject.h"
 
 class Food : public GameObject {
-    public:
-    Food(GameItems* gameItems ,Point point, int foodScore):foodScore(foodScore), GameObject(gameItems,"Food", std::vector<Point>{point}) {
-    }
-    private:
+public:
+    Food(GameItems* gameItems, Point point, int foodScore);
+
+private:
     int foodScore;
 };
 
-
-#endif //FOOD_H
+#endif // FOOD_H
