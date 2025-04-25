@@ -15,6 +15,7 @@ public:
     void addObject(std::shared_ptr<GameObject> _gameObject);
     void clearObjects();
     std::vector<std::shared_ptr<GameObject>> getObjects();
+    bool isEmpty() const;
 private:
     Point position;
     std::vector<std::shared_ptr<GameObject>> objects;
@@ -23,11 +24,15 @@ private:
 class Map {
 public:
     Map(int _width, int _height);
+    std::vector<Point> getRandomArea(unsigned width, unsigned height, unsigned maxAttempts = 10);
 
     std::pair<int,int> getSize();
     void clearMap();
     void drawObj(const std::shared_ptr<GameObject>& obj);
     std::string toString();
+
+    int getHeight() const{return height;};
+    int getWidth() const{return width;};
 private:
     int width, height;
     std::vector<std::vector<Cell*>> map;

@@ -4,6 +4,8 @@
 
 #include "Map.h"
 
+#include <random>
+
 
 Cell::Cell(int x, int y): position(x,y) {
     objects = std::vector<std::shared_ptr<GameObject>>();
@@ -19,6 +21,10 @@ void Cell::addObject(std::shared_ptr<GameObject> _gameObject) {
 
 void Cell::clearObjects() {
     objects.clear();
+}
+
+bool Cell::isEmpty() const {
+    return objects.empty();
 }
 
 std::vector<std::shared_ptr<GameObject>> Cell::getObjects() {
@@ -77,4 +83,51 @@ std::string Map::toString() {
         str += "\n";
     }
     return str;
+}
+
+std::vector<Point> Map::getRandomArea(unsigned width, unsigned height, unsigned maxAttempts) {
+    // Set up random number generation
+    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+    std::mt19937 rng(seed); // Mersenne Twister engine
+    // Define distributions for random x and y coordinates within map bounds
+    std::uniform_int_distribution<unsigned> distrib_x(0, getWidth() - width - 1);
+    std::uniform_int_distribution<unsigned> distrib_y(0, getHeight() -height - 1);
+
+    auto isAvailableBlock = [this, width, height](Point p) {
+
+        // if the block is out map
+        if (p.x + width > getWidth() || p.y + height > getHeight()) return false;
+
+        //if the block is empty
+        for (int dy = 0; dy < width; dy++) {
+            for (int dx = 0; dx < height; dx++) {
+                if (!map[p.x + dx][p.y + dy]->isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
+    auto generatePoints = [width, height](Point p) {
+        std::vector<Point> points{};
+        for (int dy = 0; dy < height; dy++) {
+            for (int dx = 0; dx < width; dx++) {
+                points.push_back(Point(p.x + dx, p.y + dy));
+            }
+        }
+
+        return points;
+    };
+
+    for (int i = 0; i < maxAttempts; i++) {
+        unsigned startX = distrib_x(rng);
+        unsigned startY = distrib_y(rng);
+        Point p(static_cast<int>(startX), static_cast<int>(startY));
+        if (isAvailableBlock(p) ){
+            return generatePoints(p);
+        }
+    }
+
+    return std::vector<Point>({Point(-1,-1)});
 }

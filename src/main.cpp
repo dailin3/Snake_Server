@@ -26,5 +26,6 @@ int main() {
     map.clearMap();
     gameItems.drawItems();
     std::cout << map.toString();
+
     return 0;
 }
