@@ -25,6 +25,7 @@ class Map {
 public:
     Map(int _width, int _height);
     std::vector<Point> getRandomArea(unsigned width, unsigned height, unsigned maxAttempts = 10);
+    std::vector<Point> getEdges();
 
     std::pair<int,int> getSize();
     void clearMap();

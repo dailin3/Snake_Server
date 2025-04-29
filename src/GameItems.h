@@ -42,6 +42,8 @@ public:
 
     void addBarrier(Point point);
 
+    void addBarrier(std::vector<Point> points);
+
     void removeSnakeById(int id);
 
     void drawItems();

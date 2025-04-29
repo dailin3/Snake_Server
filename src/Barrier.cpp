@@ -7,3 +7,7 @@
 Barrier::Barrier(GameItems* gameItems, Point point)
     : GameObject(gameItems, ObjectType::barrier, {point}) {
 }
+
+Barrier::Barrier(GameItems *gameItems, std::vector<Point> points)
+    : GameObject(gameItems, ObjectType::barrier, points) {
+}

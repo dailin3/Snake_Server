@@ -52,6 +52,10 @@ void GameItems::addBarrier(Point point) {
     barriers.push_back(std::make_shared<Barrier>(this,point));
 }
 
+void GameItems::addBarrier(std::vector<Point> points) {
+    barriers.push_back(std::make_shared<Barrier>(this, points));
+}
+
 void GameItems::removeSnakeById(int id) {
     auto it = std::find_if(snakes.begin(), snakes.end(), [id](const std::shared_ptr<Snake>& snakePtr) {
         return snakePtr->id == id;

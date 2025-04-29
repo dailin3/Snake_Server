@@ -6,17 +6,19 @@
 
 #include <iostream>
 
+#include "Room.h"
+
 int main() {
     // test Proxy
     // asio::io_context io;
     // Proxy p{io,1145};
     // p.begin();
+
     // // test GameItems
-    // auto map = Map(10,10);
+    // auto map = Map(15,15);
     // auto gameItems = GameItems(&map);
     // gameItems.addSnake({2, 2});
     // gameItems.addBarrier({3, 7});
-    // gameItems.addFood({0,0});
     //
     // gameItems.update();
     // std::cout << map.toString();
@@ -29,14 +31,24 @@ int main() {
     // s -> dead();
     // gameItems.update();
     // std::cout << map.toString();
-    //
+
     // // test generate randomly
     // std::cout << "---" <<std::endl;
     // Player p{"dora",1,PlayerState::InRoom,nullptr};
     // gameItems.addSnake(&p);
     // gameItems.addFood();
+    // gameItems.addBarrier(map.getEdges());
     // gameItems.update();
     // std::cout << map.toString();
+
+    // // test Room init
+    // Room room;
+    // Player p{"dora",1,PlayerState::InRoom,nullptr};
+    // room.addPlayer(&p);
+    // room.initMap();
+    // room.initWall();
+    // room.initSnake();
+    // std::cout << room.getMap().toString();
 
     return 0;
 }

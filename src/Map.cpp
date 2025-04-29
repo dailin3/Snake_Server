@@ -131,3 +131,16 @@ std::vector<Point> Map::getRandomArea(unsigned width, unsigned height, unsigned 
 
     return std::vector<Point>({Point(-1,-1)});
 }
+
+std::vector<Point> Map::getEdges() {
+    auto edges = std::vector<Point>();
+    for (int i=0; i < this->getWidth(); i++) {
+        edges.push_back(Point(i, 0));
+        edges.push_back(Point(i, this->getHeight() - 1));
+    }
+    for (int i=1; i < this->getHeight()-1; i++) {
+        edges.push_back(Point(0, i));
+        edges.push_back(Point(this->getWidth() - 1, i));
+    }
+    return edges;
+}
