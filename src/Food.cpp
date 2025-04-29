@@ -7,3 +7,7 @@
 Food::Food(GameItems* gameItems, Point point, int foodScore)
     : foodScore(foodScore), GameObject(gameItems, ObjectType::food,{point}) {
 }
+
+Food::Food(GameItems* gameItems, std::vector<Point> points, int foodScore)
+    : foodScore(foodScore), GameObject(gameItems, ObjectType::food,points) {
+}

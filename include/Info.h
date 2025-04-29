@@ -17,8 +17,7 @@ using json = nlohmann::json;
 enum class InfoType {
     GameOperation = 1,          // to do game operation
     RoomOperation = 2,          // to start game or join room and so on
-    RoomKeeperOperation = 3,    // to create room or delete room and so on
-    OtherOperation = 4,
+    OtherOperation = 3,
 };
 
 class ReceivedInfo {

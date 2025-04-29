@@ -15,15 +15,15 @@ GameItems::~GameItems() {
 
 }
 
-const std::vector<std::shared_ptr<Snake>>& GameItems::getSnakes() const {
+std::vector<std::shared_ptr<Snake>> GameItems::getSnakes() const {
     return snakes;
 }
 
-std::vector<std::shared_ptr<Barrier>>& GameItems::getBarriers() {
+std::vector<std::shared_ptr<Barrier>> GameItems::getBarriers() const{
     return barriers;
 }
 
-std::vector<std::shared_ptr<Food>>& GameItems::getFoods() {
+std::vector<std::shared_ptr<Food>> GameItems::getFoods() const{
     return foods;
 }
 
@@ -31,8 +31,21 @@ void GameItems::addFood(Point point, int foodScore) {
     foods.push_back(std::make_shared<Food>(this, point, foodScore));
 }
 
+void GameItems::addFood(int foodScore) {
+    auto points =  this->map->getRandomArea(1,1);
+    foods.push_back(std::make_shared<Food>(this, points ,foodScore));
+}
+
 void GameItems::addSnake(Point point) {
     snakes.push_back(std::make_shared<Snake>(this, point));
+}
+
+void GameItems::addSnake(Player* player) {
+    auto points =  this->map->getRandomArea(1,2);
+    auto direction = Direction::up;
+    auto header = points[0];
+    auto snakeLength = 20;
+    snakes.push_back(std::make_shared<Snake>(this, player ,points, header, snakeLength,direction));
 }
 
 void GameItems::addBarrier(Point point) {
@@ -61,4 +74,9 @@ void GameItems::drawItems() {
     for (const auto& b: barriers) {
         map->drawObj(b);
     }
+}
+
+void GameItems::update() {
+    map->clearMap();
+    drawItems();
 }

@@ -9,6 +9,7 @@
 #include "GameObject.h"
 #include "Barrier.h"
 #include "Food.h"
+#include "Player.h"
 
 class Snake : public GameObject {
     enum class SnakeStatus {
@@ -18,8 +19,8 @@ class Snake : public GameObject {
     };
 
 public:
-    Snake(GameItems* gameItems, Point point);
-
+    Snake(GameItems* gameItems, Point point);   // just for test
+    Snake(GameItems* gameItems, Player* player, std::vector<Point> points, Point header, int snakeLength, Direction direction = Direction::up);
     void changeDirection(Direction _direction);
     void move();
     void grow(int length = 10);
@@ -29,6 +30,7 @@ public:
     SnakeStatus setStatus(const SnakeStatus status);
 
 private:
+    Player* player = nullptr;
     Point header;
     Direction direction;
     int snakeLength;

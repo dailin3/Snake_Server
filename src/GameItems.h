@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include "Player.h"
+
 
 class Map;
 class Point;
@@ -21,21 +23,30 @@ public:
     GameItems(Map* map);
     ~GameItems();
 
-    const std::vector<std::shared_ptr<Snake>>& getSnakes() const;
+    std::vector<std::shared_ptr<Snake>> getSnakes() const;
 
-    std::vector<std::shared_ptr<Barrier>>& getBarriers();
+    std::vector<std::shared_ptr<Barrier>> getBarriers() const;
 
-    std::vector<std::shared_ptr<Food>>& getFoods();
+    std::vector<std::shared_ptr<Food>> getFoods() const;
 
     void addFood(Point point, int foodScore = 100);
 
+    // add food to a random position
+    void addFood(int foodScore = 100);
+
+    // this function should be abandoned
     void addSnake(Point point);
+
+    // add Snake to a random position
+    void addSnake(Player* player);
 
     void addBarrier(Point point);
 
     void removeSnakeById(int id);
 
     void drawItems();
+
+    void update();
 
 private:
     Map* map;

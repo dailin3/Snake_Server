@@ -11,6 +11,8 @@ class Food : public GameObject {
 public:
     Food(GameItems* gameItems, Point point, int foodScore);
 
+    Food(GameItems* gameItems, std::vector<Point> point, int foodScore);
+
 private:
     int foodScore;
 };

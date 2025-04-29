@@ -10,6 +10,13 @@ Snake::Snake(GameItems* gameItems, Point point)
     snakeLength = 10;
 }
 
+Snake::Snake(GameItems *gameItems,Player* player ,std::vector<Point> points, Point header, int snakeLength, Direction direction)
+    : header(header), GameObject(gameItems, ObjectType::snake, points), direction(direction), snakeLength(snakeLength), player(player) {
+
+}
+
+
+
 void Snake::changeDirection(Direction _direction) {
     this->direction = _direction;
 }
