@@ -6,13 +6,14 @@
 
 #include <iostream>
 
+#include "GameThread.h"
 #include "Room.h"
 
 int main() {
     // test Proxy
-    // asio::io_context io;
-    // Proxy p{io,1145};
-    // p.begin();
+    asio::io_context io;
+    Proxy proxy{io,1145};
+    std::thread proxyThread(&Proxy::begin, &proxy);
 
     // // test GameItems
     // auto map = Map(15,15);
@@ -41,14 +42,30 @@ int main() {
     // gameItems.update();
     // std::cout << map.toString();
 
-    // // test Room init
-    // Room room;
-    // Player p{"dora",1,PlayerState::InRoom,nullptr};
-    // room.addPlayer(&p);
-    // room.initMap();
-    // room.initWall();
-    // room.initSnake();
-    // std::cout << room.getMap().toString();
+    // test Room and GameThread.
+    Room room;
+    Player p{"dora",1,PlayerState::InRoom,nullptr};
+    room.addPlayer(&p);
 
+    // bind both
+    auto gt = new GameThread(&room);
+    room.setGameThread(gt);
+
+    gt->initGame();
+    std::cout << room.getRoomId() << std::endl;
+    std::cout << room.getMap().toString();
+
+    nlohmann::json testjson{
+        {"type", 1},
+        {"roomId", 0},
+        {"playerId",1},
+        {"payload",{"data","up"}}
+    };
+    ReceivedInfo reinfo{testjson,nullptr};
+    room.pushOperations(reinfo);
+
+    //gt->gameEachLoop();
+
+    proxyThread.join();
     return 0;
 }

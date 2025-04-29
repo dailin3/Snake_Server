@@ -15,12 +15,16 @@ private:
     std::thread thread;
     Room* room;
 
+    void handleEachOperation(ReceivedInfo& received_info);
+    void handleCollision();
+    void sendResult();
+
 public:
     GameThread(Room* room);
     Room* getRoom() const;
 
     void initGame();
-    void gameLoop();
+    void gameEachLoop();
 };
 
 

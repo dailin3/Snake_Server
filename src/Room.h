@@ -41,6 +41,10 @@ public:
         this->gameThread = gameThread;
     }
 
+    void setRoomState(RoomState roomState) {
+        this->state = roomState;
+    }
+
     std::vector<ReceivedInfo> getOperationsList() {
         std::vector<ReceivedInfo> operationsList;
         while (!operationsQueue.empty()) {
@@ -60,6 +64,9 @@ public:
 
     void removePlayer(Player* player) {
         players.erase(std::ranges::remove(this->players, player).begin(), this->players.end());
+    }
+    std::vector<Player*> getPlayers() const {
+        return players;
     }
 
     void initMap(int width = 25, int height =25) {

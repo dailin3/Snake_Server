@@ -20,7 +20,7 @@ enum class PlayerState {
 
 class Player {
 public:
-    Player(const std::string &name, int id, PlayerState state, const websocket::stream<asio::ip::tcp::socket> *ws)
+    Player(const std::string &name, int id, PlayerState state, websocket::stream<asio::ip::tcp::socket> *ws)
         : name(name),
           id(id),
           state(state),
@@ -39,7 +39,7 @@ public:
         return state;
     }
 
-    [[nodiscard]] const websocket::stream<asio::ip::tcp::socket> * getWS() const {
+    [[nodiscard]] websocket::stream<asio::ip::tcp::socket> * getWS() const {
         return ws;
     }
 
@@ -47,7 +47,7 @@ private:
     std::string name;
     int id;
     PlayerState state;
-    const websocket::stream<asio::ip::tcp::socket>* ws;
+    websocket::stream<asio::ip::tcp::socket>* ws;
     Room* room;
 };
 

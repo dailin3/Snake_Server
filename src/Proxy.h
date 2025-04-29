@@ -57,6 +57,7 @@ class Proxy {
     void send(SendInfo& info) {
         auto objlst = info.getObjectList();
         for (auto obj : objlst) {
+            std::cout << "WS_Session send:" <<info.getPayload().dump() << std::endl;
             obj -> write(asio::buffer(info.getPayload().dump()));
         }
     }
