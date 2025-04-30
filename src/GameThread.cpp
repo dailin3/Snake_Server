@@ -74,6 +74,14 @@ void GameThread::gameEnd() {
 
 }
 
+void GameThread::start() {
+    thread = std::thread(&GameThread::gameLoop, this);
+}
+
+void GameThread::join() {
+    thread.join();
+}
+
 GameThread::GameThread(Room *room): room(room) {
 }
 
@@ -120,3 +128,5 @@ void GameThread::gameLoop() {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
+
+

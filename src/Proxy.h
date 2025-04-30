@@ -69,7 +69,7 @@ class Proxy {
     asio::io_context& io_context;
     asio::ip::tcp::acceptor acceptor;
 
-    static void _handleInfo(const json& jsonInfo, const websocket::stream<asio::ip::tcp::socket>* ws) {
+    static void _handleInfo(const json& jsonInfo, websocket::stream<asio::ip::tcp::socket>* ws) {
         bool isGoodInfo = true; // TODO: think about whether the json is in right form and complete it.
         if (isGoodInfo) {
             const ReceivedInfo info{jsonInfo, ws};

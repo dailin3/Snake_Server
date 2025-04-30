@@ -8,12 +8,13 @@
 
 #include "GameThread.h"
 #include "Room.h"
+#include "RoomKeeper.h"
 
 int main() {
     // test Proxy
-    // asio::io_context io;
-    // Proxy proxy{io,1145};
-    // std::thread proxyThread(&Proxy::begin, &proxy);
+    asio::io_context io;
+    Proxy proxy{io,1145};
+    std::thread proxyThread(&Proxy::begin, &proxy);
 
     // // test GameItems
     // auto map = Map(15,15);
@@ -43,32 +44,36 @@ int main() {
     // std::cout << map.toString();
 
     // test Room and GameThread.
-    Room room;
-    Player p{"dora",1,PlayerState::InRoom,nullptr};
-    room.addPlayer(&p);
+    // Room room;
+    // Player p{"dora",1,PlayerState::InRoom,nullptr};
+    // room.addPlayer(&p);
+    //
+    //  // bind both
+    //  auto gt = new GameThread(&room);
+    //  room.setGameThread(gt);
+    //
+    //  nlohmann::json testjson{
+    //      {"type", 1},
+    //      {"roomId", 0},
+    //      {"playerId",1},
+    //      {"payload",
+    //          {
+    //          {"type", static_cast<int>(GameOperationType::changeDirection)},
+    //          {"data",
+    //              {
+    //              {"newDirection",static_cast<int>(Direction::left)}
+    //              }
+    //          }
+    //          }
+    //      }
+    //  };
+    //  ReceivedInfo reinfo{testjson,nullptr};
+    //  room.pushOperations(reinfo);
+    //
+    // gt->gameLoop();
 
-     // bind both
-     auto gt = new GameThread(&room);
-     room.setGameThread(gt);
-
-     nlohmann::json testjson{
-         {"type", 1},
-         {"roomId", 0},
-         {"playerId",1},
-         {"payload",
-             {
-             {"type", static_cast<int>(GameOperationType::changeDirection)},
-             {"data",
-                 {
-                 {"newDirection",static_cast<int>(Direction::left)}
-                 }
-             }
-             }
-         }
-     };
-     ReceivedInfo reinfo{testjson,nullptr};
-     room.pushOperations(reinfo);
-
-    gt->gameLoop();
+    proxyThread.detach();
+    auto roomkeeper = new RoomKeeper();
+    roomkeeper->runningLoop();
     return 0;
 }

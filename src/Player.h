@@ -4,15 +4,14 @@
 
 #ifndef PLAYER_H
 #define PLAYER_H
-#include <string>
 
+#include <string>
 #include "Proxy.h"
 
 class Room;
 
 enum class PlayerState {
     Playing = 1,
-    Leave = 4,
     Ready = 2,
     InRoom = 3,
     Dissociated = 4,
@@ -20,35 +19,37 @@ enum class PlayerState {
 
 class Player {
 public:
-    Player(const std::string &name, int id, PlayerState state, websocket::stream<asio::ip::tcp::socket> *ws)
-        : name(name),
-          id(id),
-          state(state),
-          ws(ws) {
-    }
+    static int maxId;
 
-    [[nodiscard]] std::string getName() const {
-        return name;
-    }
+    Player(const std::string &name, PlayerState state, websocket::stream<asio::ip::tcp::socket> *ws);
+    Player(const std::string &name, websocket::stream<asio::ip::tcp::socket> *ws);
 
-    [[nodiscard]] int getId() const {
-        return id;
-    }
+    [[nodiscard]] std::string getName() const;
+    void setName(const std::string &name);
 
-    [[nodiscard]] PlayerState getState() const {
-        return state;
-    }
+    void setState(PlayerState state);
+    void setWs(websocket::stream<asio::ip::tcp::socket> *ws);
+    void setRoom(Room* room);
 
-    [[nodiscard]] websocket::stream<asio::ip::tcp::socket> * getWS() const {
-        return ws;
-    }
+    void joinRoom(Room* room);
+    void leaveRoom();
+
+    int ready();
+    int unready();
+
+    void joinGame();
+    void overGame();
+
+    [[nodiscard]] int getId() const;
+    [[nodiscard]] PlayerState getState() const;
+    [[nodiscard]] websocket::stream<asio::ip::tcp::socket> * getWS() const;
 
 private:
     std::string name;
     int id;
     PlayerState state;
     websocket::stream<asio::ip::tcp::socket>* ws;
-    Room* room;
+    Room* room = nullptr;
 };
 
 #endif //PLAYER_H

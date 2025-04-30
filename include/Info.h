@@ -26,7 +26,6 @@ enum class RoomOperationType {
     createPlayer = 1,    // 创建玩家
     removePlayer = 2,    // 移除玩家
     createRoom = 3,      // 创建房间
-    removeRoom = 4,      // 移除房间
     joinRoom = 5,        // 加入房间
     leaveRoom = 6,       // 离开房间
     readyRoom = 7,       // 准备
@@ -52,11 +51,13 @@ public:
         payload.type = static_cast<RoomOperationType>(j.at("type").get<int>());
 
         if (payload.type == RoomOperationType::joinRoom) payload.roomId = j["data"]["roomId"].get<int>();
+        if (payload.type == RoomOperationType::createPlayer) payload.name = j["data"]["name"].get<std::string>();
 
         return payload;
     }
     RoomOperationType type;
     int roomId {-1};
+    std::string name;
 };
 
 class GameOperationPayload : public OperationPayload {
@@ -97,15 +98,15 @@ public:
         return roomPayload;
     }
 
-    [[nodiscard]] json getPlayerId() const {
+    [[nodiscard]] int getPlayerId() const {
         return playerId;
     }
 
-    [[nodiscard]] const websocket::stream<asio::ip::tcp::socket>* getWS() {
+    [[nodiscard]] websocket::stream<asio::ip::tcp::socket>* getWS() {
         return ws;
     }
 
-    ReceivedInfo(const json& j, const websocket::stream<asio::ip::tcp::socket>* _ws) : ws(_ws) {
+    ReceivedInfo(const json& j, websocket::stream<asio::ip::tcp::socket>* _ws) : ws(_ws) {
         type = static_cast<InfoType>(j["type"].get<int>());
         roomId = j.value("roomId", -1);
         playerId = j.value("playerId", -1);
@@ -124,7 +125,7 @@ private:
     json rawPayload;
     GameOperationPayload gamePayload = {};
     RoomOperationPayload roomPayload = {};
-    const websocket::stream<asio::ip::tcp::socket>* ws;
+    websocket::stream<asio::ip::tcp::socket>* ws;
 };
 
 enum class Responsecode {

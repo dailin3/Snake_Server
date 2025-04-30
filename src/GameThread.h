@@ -29,6 +29,8 @@ public:
     void gameEachLoop();
     void gameLoop();
     void gameEnd();
+    void start();
+    void join();
 };
 
 

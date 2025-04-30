@@ -1,15 +1,17 @@
-//
-// Created by dailin on 25-4-1.
-//
-
+// Room.h
 #ifndef ROOM_H
 #define ROOM_H
 
 #include <iostream>
+#include <vector>
+#include <queue>
+#include <vector>
 
 #include "GameItems.h"
+#include "GameThread.h"
 #include "Info.h"
 #include "Map.h"
+
 class GameThread;
 class Player;
 
@@ -21,100 +23,34 @@ enum class RoomState {
 
 class Room {
 public:
+    Room();
+
+    [[nodiscard]] int getId() const;
+    [[nodiscard]] RoomState getState() const;
+    [[nodiscard]] GameThread* getGameThread() const;
+    [[nodiscard]] GameItems getGameItems() const;
+    [[nodiscard]] Map getMap() const;
+    [[nodiscard]] std::vector<Player*> getPlayers() const;
+    [[nodiscard]] Player* getPlayerById(int id);
+    [[nodiscard]] json getGameInfo() const;
+
+    void setGameThread(GameThread* gameThread);
+    void setRoomState(RoomState roomState);
+    void addPlayer(Player* player);
+    void removePlayer(Player* player);
+    void pushOperations(const ReceivedInfo& operation);
+    std::vector<ReceivedInfo> getOperationsList();
+
+    void initMap(int width = 25, int height = 25);
+    void initGameItems();
+    void initWall();
+    void initSnake();
+
+    int startGame(Player* player);
+    int stopGame(Player* player);
+    void overGame();
+
     int frame = 0;
-
-    [[nodiscard]] int getRoomId() const {
-        return roomId;
-    }
-
-    [[nodiscard]] RoomState getState() const {
-        return state;
-    }
-
-    [[nodiscard]] GameThread* getGameThread() const {
-        return gameThread;
-    }
-
-    [[nodiscard]] GameItems getGameItems() const {
-        return gameItems;
-    }
-
-    Map getMap() const {
-        return map;
-    }
-
-    void setGameThread(GameThread* gameThread) {
-        this->gameThread = gameThread;
-    }
-
-    void setRoomState(RoomState roomState) {
-        this->state = roomState;
-    }
-
-    std::vector<ReceivedInfo> getOperationsList() {
-        std::vector<ReceivedInfo> operationsList;
-        while (!operationsQueue.empty()) {
-            operationsList.push_back(operationsQueue.front());
-            this->operationsQueue.pop();
-        }
-        return operationsList;
-    }
-
-    void pushOperations(const ReceivedInfo& operation) {
-        this->operationsQueue.push(operation);
-    }
-
-    void addPlayer(Player* player) {
-        this -> players.push_back(player);
-    }
-
-    [[nodiscard]] Player* getPlayerById(int id) {
-        std::vector<Player *> players = getPlayers();
-        for (int i = 0; i < players.size(); i++) {
-            if (players[i]->getId() == id) {
-                return players[i];
-            }
-        }
-        return nullptr;
-    }
-
-    void removePlayer(Player* player) {
-        players.erase(std::ranges::remove(this->players, player).begin(), this->players.end());
-    }
-    [[nodiscard]] std::vector<Player*> getPlayers() const {
-        return players;
-    }
-
-    void initMap(int width = 25, int height =25) {
-        this->map = Map(width, height);
-    }
-
-    void initGameItems() {
-        this->gameItems = GameItems(&map);
-    }
-
-    void initWall() {
-        this->gameItems.addBarrier(map.getEdges());
-        this->gameItems.update();
-    }
-
-    void initSnake() {
-        for (const auto & player : this->players) {
-            this->gameItems.addSnake(player);
-        }
-        this->gameItems.update();
-    }
-
-    [[nodiscard]] json getGameInfo() const {
-        json gameInfo{};
-        // TODO: return gameitems and map info.
-        return gameInfo;
-    }
-
-    Room():  map{25,25},gameItems{&map} {
-        roomId = maxRoomId++;
-        state = RoomState::Readying;
-    };
 
 private:
     static int maxRoomId;
@@ -122,12 +58,9 @@ private:
     RoomState state;
     std::vector<Player*> players = std::vector<Player*>();
     GameThread* gameThread = nullptr;
-    // TODO: create a new operation instance queue which replaces playerID with player pointer.
     std::queue<ReceivedInfo> operationsQueue;
     GameItems gameItems;
     Map map;
 };
 
-
-
-#endif //ROOM_H
+#endif // ROOM_H
