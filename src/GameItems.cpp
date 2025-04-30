@@ -27,6 +27,13 @@ std::vector<std::shared_ptr<Food>> GameItems::getFoods() const{
     return foods;
 }
 
+std::shared_ptr<Snake> GameItems::getSnakeByPlayerId(int id) const {
+    for (auto& snake : snakes) {
+        if (snake->getPlayer()->getId() == id) {return snake;}
+    }
+    return nullptr;
+}
+
 void GameItems::addFood(Point point, int foodScore) {
     foods.push_back(std::make_shared<Food>(this, point, foodScore));
 }

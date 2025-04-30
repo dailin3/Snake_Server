@@ -29,6 +29,8 @@ public:
 
     std::vector<std::shared_ptr<Food>> getFoods() const;
 
+    std::shared_ptr<Snake> getSnakeByPlayerId(int id) const;
+
     void addFood(Point point, int foodScore = 100);
 
     // add food to a random position

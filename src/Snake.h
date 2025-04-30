@@ -28,6 +28,7 @@ public:
     void judge();
     void react();
     SnakeStatus setStatus(const SnakeStatus status);
+    Player* getPlayer() const;
 
 private:
     Player* player = nullptr;

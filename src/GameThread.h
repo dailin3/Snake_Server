@@ -16,6 +16,8 @@ private:
     Room* room;
 
     void handleEachOperation(ReceivedInfo& received_info);
+    void snakeMove();
+    void bornAndDead();
     void handleCollision();
     void sendResult();
 
@@ -25,6 +27,8 @@ public:
 
     void initGame();
     void gameEachLoop();
+    void gameLoop();
+    void gameEnd();
 };
 
 

@@ -11,9 +11,9 @@
 
 int main() {
     // test Proxy
-    asio::io_context io;
-    Proxy proxy{io,1145};
-    std::thread proxyThread(&Proxy::begin, &proxy);
+    // asio::io_context io;
+    // Proxy proxy{io,1145};
+    // std::thread proxyThread(&Proxy::begin, &proxy);
 
     // // test GameItems
     // auto map = Map(15,15);
@@ -47,25 +47,28 @@ int main() {
     Player p{"dora",1,PlayerState::InRoom,nullptr};
     room.addPlayer(&p);
 
-    // bind both
-    auto gt = new GameThread(&room);
-    room.setGameThread(gt);
+     // bind both
+     auto gt = new GameThread(&room);
+     room.setGameThread(gt);
 
-    gt->initGame();
-    std::cout << room.getRoomId() << std::endl;
-    std::cout << room.getMap().toString();
+     nlohmann::json testjson{
+         {"type", 1},
+         {"roomId", 0},
+         {"playerId",1},
+         {"payload",
+             {
+             {"type", static_cast<int>(GameOperationType::changeDirection)},
+             {"data",
+                 {
+                 {"newDirection",static_cast<int>(Direction::left)}
+                 }
+             }
+             }
+         }
+     };
+     ReceivedInfo reinfo{testjson,nullptr};
+     room.pushOperations(reinfo);
 
-    nlohmann::json testjson{
-        {"type", 1},
-        {"roomId", 0},
-        {"playerId",1},
-        {"payload",{"data","up"}}
-    };
-    ReceivedInfo reinfo{testjson,nullptr};
-    room.pushOperations(reinfo);
-
-    //gt->gameEachLoop();
-
-    proxyThread.join();
+    gt->gameLoop();
     return 0;
 }

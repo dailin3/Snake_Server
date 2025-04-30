@@ -21,6 +21,8 @@ enum class RoomState {
 
 class Room {
 public:
+    int frame = 0;
+
     [[nodiscard]] int getRoomId() const {
         return roomId;
     }
@@ -31,6 +33,10 @@ public:
 
     [[nodiscard]] GameThread* getGameThread() const {
         return gameThread;
+    }
+
+    [[nodiscard]] GameItems getGameItems() const {
+        return gameItems;
     }
 
     Map getMap() const {
@@ -62,10 +68,20 @@ public:
         this -> players.push_back(player);
     }
 
+    [[nodiscard]] Player* getPlayerById(int id) {
+        std::vector<Player *> players = getPlayers();
+        for (int i = 0; i < players.size(); i++) {
+            if (players[i]->getId() == id) {
+                return players[i];
+            }
+        }
+        return nullptr;
+    }
+
     void removePlayer(Player* player) {
         players.erase(std::ranges::remove(this->players, player).begin(), this->players.end());
     }
-    std::vector<Player*> getPlayers() const {
+    [[nodiscard]] std::vector<Player*> getPlayers() const {
         return players;
     }
 
@@ -87,6 +103,12 @@ public:
             this->gameItems.addSnake(player);
         }
         this->gameItems.update();
+    }
+
+    [[nodiscard]] json getGameInfo() const {
+        json gameInfo{};
+        // TODO: return gameitems and map info.
+        return gameInfo;
     }
 
     Room():  map{25,25},gameItems{&map} {
