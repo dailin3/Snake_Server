@@ -20,41 +20,33 @@ using json = nlohmann::json;
 
 
 class Proxy {
-    public:
+public:
     static std::queue<ReceivedInfo> receivedQueue;
     static std::queue<SendInfo> sendQueue;
 
-    Proxy(asio::io_context& _io_context, const unsigned short _port) : acceptor(_io_context,{asio::ip::tcp::v4(),_port}), io_context(_io_context) {}
+    Proxy(asio::io_context& _io_context, const unsigned short _port) : acceptor(nullptr), io_context(_io_context), port(_port) {}
 
-    [[noreturn]] void begin() {
-        while (true) {
-            if (isRunning) {
-                // handle receive message
-                asio::ip::tcp::socket socket(io_context);
-                acceptor.accept(socket);
-                // Confused: why have to write in such format?
-                std::thread([this](asio::ip::tcp::socket s){this->_websocket_session(std::move(s));}, std::move(socket)).detach();
-
-                // clear the send message list
-                if (!sendQueue.empty()) {
-                    SendInfo sendInfo = sendQueue.front();
-                    send(sendInfo);
-                    sendQueue.pop();
-                }
-                // clear the received message list
-                if (!receivedQueue.empty()) {
-                    ReceivedInfo receivedInfo = receivedQueue.front();
-                    distributeInfo(receivedInfo);
-                    receivedQueue.pop();
-                }
-            }
+    void start() {
+        if (!isRunning) {
+            isRunning = true;
+            acceptor = std::make_unique<asio::ip::tcp::acceptor>(io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port));
+            acceptThread = std::thread(&Proxy::acceptfunction, this);
+            sendThread = std::thread(&Proxy::sendfunction, this);
+            std::cout << "Proxy started at port: "<< port << std::endl;
         }
     }
 
-    void start() {isRunning = true;}
-    void stop() {isRunning = false;}
+    void stop() {
+        if (isRunning) {
+            isRunning = false;
+            acceptor->close();
+            acceptThread.join();
+            sendThread.join();
+            std::cout << "Proxy stopped!" << std::endl;
+        }
+    }
 
-    void send(SendInfo& info) {
+    static void send(SendInfo& info) {
         auto objlst = info.getObjectList();
         for (auto obj : objlst) {
             std::cout << "WS_Session send:" <<info.getPayload().dump() << std::endl;
@@ -62,12 +54,13 @@ class Proxy {
         }
     }
 
-    void distributeInfo(ReceivedInfo& info){}  // TODO: to distribute the received info to other queue
-
-    private:
-    bool isRunning = true;
+private:
+    bool isRunning = false;
     asio::io_context& io_context;
-    asio::ip::tcp::acceptor acceptor;
+    std::unique_ptr<asio::ip::tcp::acceptor> acceptor;
+    const unsigned short port;
+    std::thread acceptThread;
+    std::thread sendThread;
 
     static void _handleInfo(const json& jsonInfo, websocket::stream<asio::ip::tcp::socket>* ws) {
         bool isGoodInfo = true; // TODO: think about whether the json is in right form and complete it.
@@ -113,6 +106,30 @@ class Proxy {
                 }
             }
             buffer.consume(buffer.size());
+        }
+    }
+
+    void acceptfunction() {
+        while (isRunning) {
+            try {
+                asio::ip::tcp::socket socket(io_context);
+                acceptor->accept(socket);
+                std::thread(&Proxy::_websocket_session, std::move(socket)).detach();
+            } catch (const std::exception& e) {
+                if (!isRunning) break; // 正常退出
+                std::cerr << "accept error: " << e.what() << std::endl;
+            }
+        }
+    }
+
+    void sendfunction() {
+        while (isRunning) {
+            // clear the send message list
+            if (!sendQueue.empty()) {
+                SendInfo sendInfo = sendQueue.front();
+                send(sendInfo);
+                sendQueue.pop();
+            }
         }
     }
 };

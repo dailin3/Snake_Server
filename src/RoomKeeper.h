@@ -124,7 +124,11 @@ private:
             }else if (type == RoomOperationType::roomInfo) {
 
             }else if (type == RoomOperationType::roomKeeperInfo) {
-
+                std::vector<websocket::stream<asio::ip::tcp::socket>*> ws_list;
+                ws_list.push_back(ws);
+                json payload1{{"code",205}};
+                SendInfo send_info{ws_list,payload1};
+                Proxy::sendQueue.push(send_info);
             }else if (type == RoomOperationType::playerInfo) {
 
             }else {
