@@ -22,3 +22,10 @@ GameObject::GameObject(GameItems* _gameItems ,ObjectType _type, const std::vecto
     : gameItems(_gameItems), type(_type), points(_points) {
     id = ++maxId;
 }
+
+nlohmann::json GameObject::to_json() const {
+    return nlohmann::json{
+        {"id", id},
+        {"type", type}
+    };
+}

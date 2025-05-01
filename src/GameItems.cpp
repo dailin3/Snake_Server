@@ -91,3 +91,29 @@ void GameItems::update() {
     map->clearMap();
     drawItems();
 }
+
+json GameItems::getGameItemsJson() const {
+    auto snake_array = json::array();
+    auto food_array = json::array();
+    auto barrier_array = json::array();
+    for (auto snake : snakes){
+        auto snake_json = snake->to_json();
+        snake_json["playerId"] = snake->getPlayer()->getId();
+        snake_json["playerName"] = snake->getPlayer()->getName();
+        snake_array.push_back(snake_json);
+    }
+    for (auto food : foods) {
+        auto food_json = food->to_json();
+        food_array.push_back(food_json);
+    }
+    for (auto barrier : barriers) {
+        auto barrier_json = barrier->to_json();
+        barrier_array.push_back(barrier_json);
+    }
+
+    return json{
+        {"snakes",snake_array},
+        {"foods",food_array},
+        {"barriers",barrier_array},
+    };
+}

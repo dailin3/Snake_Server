@@ -27,6 +27,20 @@ bool Cell::isEmpty() const {
     return objects.empty();
 }
 
+nlohmann::json Cell::to_json() const {
+    nlohmann::json j;
+    nlohmann::json objsJson = nlohmann::json::array();
+
+    for (const auto& object : objects) {
+        if (object) {
+            objsJson.push_back(object->to_json());
+        }
+    }
+
+    j["objs"] = objsJson;
+    return j;
+}
+
 std::vector<std::shared_ptr<GameObject>> Cell::getObjects() {
     return objects;
 }
@@ -83,6 +97,27 @@ std::string Map::toString() {
         str += "\n";
     }
     return str;
+}
+
+nlohmann::json Map::getMapJson() const {
+    nlohmann::json j;
+    j["width"] = width;
+    j["height"] = height;
+
+    nlohmann::json mapJson = nlohmann::json::array();
+    for (const auto& row : map) {
+        nlohmann::json rowJson = nlohmann::json::array();
+        for (const auto cell : row) {
+            if (cell) {
+                rowJson.push_back(cell->to_json());
+            } else {
+                rowJson.push_back(nullptr);
+            }
+        }
+        mapJson.push_back(rowJson);
+    }
+    j["map"] = mapJson;
+    return j;
 }
 
 std::vector<Point> Map::getRandomArea(unsigned width, unsigned height, unsigned maxAttempts) {

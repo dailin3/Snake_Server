@@ -6,6 +6,7 @@
 #define GAMEOBJECT_H
 
 #include <iostream>
+#include <nlohmann/json.hpp>
 
 class GameItems;
 
@@ -39,6 +40,8 @@ public:
     static int maxId;
 
     GameObject(GameItems* _gameItems ,ObjectType _type, const std::vector<Point> _points);
+
+    [[nodiscard]] nlohmann::json to_json() const;
 
     std::vector<Point> points;
     int id;

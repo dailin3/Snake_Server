@@ -73,14 +73,8 @@ int main() {
     //
     // gt->gameLoop();
 
-    auto roomkeeper = new RoomKeeper();
-    std::thread t([&roomkeeper]() {roomkeeper->runningLoop();});
-
-    // proxy.stop();
-    proxy.start();
-    // proxy.start();
-    //proxy.stop();
-    proxy.stop();
+    auto roomkeeper = RoomKeeper();
+    roomkeeper.start();
     proxy.start();
     while (true);
     return 0;

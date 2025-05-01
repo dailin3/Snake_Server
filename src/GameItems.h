@@ -52,6 +52,8 @@ public:
 
     void update();
 
+    [[nodiscard]] json getGameItemsJson() const;
+
 private:
     Map* map;
     std::vector<std::shared_ptr<Snake>> snakes;

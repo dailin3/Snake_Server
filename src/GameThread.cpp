@@ -10,21 +10,28 @@ void GameThread::handleEachOperation(ReceivedInfo& received_info) {
     GameOperationPayload payload = received_info.getGamePayload();
     int playerId = received_info.getPlayerId();
     auto player = room->getPlayerById(playerId);
+    auto ws = received_info.getWS();
 
-    // TODO: give user feedback in ws
     if (payload.type == GameOperationType::born) {
         room->getGameItems().addSnake(player);
-
+        SendInfo info{ws};
+        Proxy::sendQueue.push(info);
     }else if (payload.type == GameOperationType::changeDirection) {
         auto snake = room->getGameItems().getSnakeByPlayerId(playerId);
         snake->changeDirection(payload.newDirection);
+        SendInfo info{ws};
+        Proxy::sendQueue.push(info);
     }
     else if (payload.type == GameOperationType::getGameInfo) {
         json gameInfo{};
         gameInfo = room->getGameInfo();
+        SendInfo info{ws,Responsecode::success,"",gameInfo};
+        Proxy::sendQueue.push(info);
     }
     else {
-        std::cout << (int)payload.type << std::endl;
+        std::cout<< "RoomKeeper error unknown type : " <<static_cast<int>(payload.type) << std::endl;
+        SendInfo err_info{ws,Responsecode::failed,"Unknown type"};
+        Proxy::sendQueue.push(err_info);
     }
 }
 
@@ -59,13 +66,9 @@ void GameThread::sendResult() {
     for (const auto& player : room->getPlayers()) ws_list.push_back(player->getWS());
 
     //make payload
-    auto map = this->room->getMap().toString();  // TODO: add more details for render
-    nlohmann::json payload{
-        {"map",map}
-    };
-
+    auto gameJson = this->room->getGameJson();
     // send info
-    SendInfo send_info{ws_list,payload};
+    SendInfo send_info{ws_list,Responsecode::update,"",gameJson};
     Proxy::sendQueue.push(send_info);
 }
 

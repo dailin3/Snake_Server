@@ -44,6 +44,8 @@ public:
     [[nodiscard]] PlayerState getState() const;
     [[nodiscard]] websocket::stream<asio::ip::tcp::socket> * getWS() const;
 
+    json getPlayerJson() const;
+
 private:
     std::string name;
     int id;

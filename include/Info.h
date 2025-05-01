@@ -52,12 +52,15 @@ public:
 
         if (payload.type == RoomOperationType::joinRoom) payload.roomId = j["data"]["roomId"].get<int>();
         if (payload.type == RoomOperationType::createPlayer) payload.name = j["data"]["name"].get<std::string>();
+        if (payload.type == RoomOperationType::roomInfo) payload.roomId = j["data"]["roomId"].get<int>();
+        if (payload.type == RoomOperationType::playerInfo) payload.playerId = j["data"]["playerId"].get<int>();
 
         return payload;
     }
     RoomOperationType type;
     int roomId {-1};
     std::string name;
+    int playerId {-1};
 };
 
 class GameOperationPayload : public OperationPayload {
@@ -129,15 +132,19 @@ private:
 };
 
 enum class Responsecode {
-    success = 0,
-    failed = 1,
+    success = 1,
+    failed = -1,
+    update = 2,
 };
 
 class SendInfo {
 public:
-    SendInfo(std::vector<websocket::stream<asio::ip::tcp::socket>*> _object_list, json _payload, Responsecode _responsecode = Responsecode::success, std::string _msg = "")
-    : object_list(std::move(_object_list)), payload(std::move(_payload)), code(_responsecode), msg(std::move(_msg)) {
-
+    SendInfo(std::vector<websocket::stream<asio::ip::tcp::socket>*> _object_list, Responsecode _responsecode = Responsecode::success, std::string _msg = "", json data= json {})
+    : object_list(std::move(_object_list)), payload(std::move(data)), code(_responsecode), msg(std::move(_msg)) {
+    }
+    SendInfo(websocket::stream<asio::ip::tcp::socket>* _object, Responsecode _responsecode = Responsecode::success, std::string _msg = "", json data = json {})
+    : payload(std::move(data)), code(_responsecode), msg(std::move(_msg)) {
+        object_list.push_back(_object);
     }
 
     [[nodiscard]] std::vector<websocket::stream<asio::ip::tcp::socket>*> getObjectList() const {
@@ -145,6 +152,14 @@ public:
     }
     [[nodiscard]] json getPayload() const {
         return payload;
+    }
+
+    [[nodiscard]] json getJson() const {
+        return json{
+            {"code",code},
+            {"msg",msg},
+            {"data",payload}
+        };
     }
 private:
     std::vector<websocket::stream<asio::ip::tcp::socket>*> object_list;

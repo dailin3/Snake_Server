@@ -52,6 +52,12 @@ public:
 
     int frame = 0;
 
+    [[nodiscard]] json getRoomJson() const;
+
+    [[nodiscard]] json getGameJson() const;
+
+    [[nodiscard]] std::vector<json> getPlayersJson() const;
+
 private:
     static int maxRoomId;
     int roomId;

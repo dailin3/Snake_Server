@@ -128,3 +128,29 @@ Room * RoomKeeper::getRoomById(int id) {
     }
     return nullptr;
 }
+
+std::vector<json> RoomKeeper::getPlayersJson() const {
+    std::vector<json> playersJson;
+    playersJson.reserve(players.size());
+    for (Player* player : players) {
+        playersJson.push_back(player->getPlayerJson());
+    }
+    return playersJson;
+}
+
+std::vector<json> RoomKeeper::getRoomsJson() const {
+    std::vector<json> roomsJson;
+    roomsJson.reserve(rooms.size());
+    for (Room* room : rooms) {
+        roomsJson.push_back(room->getRoomJson());
+    }
+    return roomsJson;
+}
+
+json RoomKeeper::getRoomKeeperJson() const {
+    json roomKeeperJson;
+    roomKeeperJson["isRunning"] = isRunning;
+    roomKeeperJson["players"] = getPlayersJson();
+    roomKeeperJson["rooms"] = getRoomsJson();
+    return roomKeeperJson;
+}

@@ -135,3 +135,31 @@ void Room::overGame() {
         }
     }
 }
+
+json Room::getGameJson() const {
+    json gameJson{};
+    gameJson["frame"] = frame;
+    gameJson["roomId"] = roomId;
+    gameJson["state"] = state;
+    gameJson["players"] = getPlayersJson();
+    gameJson["map"] = map.getMapJson();
+    gameJson["gameItems"]= gameItems.getGameItemsJson();
+    return gameJson;
+}
+
+std::vector<json> Room::getPlayersJson() const {
+    std::vector<json> playersJson;
+    playersJson.reserve(players.size());
+    for (Player* player : players) {
+        playersJson.push_back(player->getPlayerJson());
+    }
+    return playersJson;
+}
+
+json Room::getRoomJson() const {
+    json roomJson{};
+    roomJson["id"] = roomId;
+    roomJson["state"] = state;
+    roomJson["players"] = getPlayersJson();
+    return roomJson;
+}

@@ -5,6 +5,9 @@
 #ifndef MAP_H
 #define MAP_H
 
+#include <nlohmann/json.hpp>
+#include <nlohmann/json.hpp>
+
 #include "GameObject.h"
 
 class Cell {
@@ -16,6 +19,8 @@ public:
     void clearObjects();
     std::vector<std::shared_ptr<GameObject>> getObjects();
     bool isEmpty() const;
+
+    [[nodiscard]] nlohmann::json to_json() const;
 private:
     Point position;
     std::vector<std::shared_ptr<GameObject>> objects;
@@ -34,6 +39,8 @@ public:
 
     int getHeight() const{return height;};
     int getWidth() const{return width;};
+
+    [[nodiscard]] nlohmann::json getMapJson() const;
 private:
     int width, height;
     std::vector<std::vector<Cell*>> map;

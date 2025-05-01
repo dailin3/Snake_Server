@@ -46,14 +46,6 @@ public:
         }
     }
 
-    static void send(SendInfo& info) {
-        auto objlst = info.getObjectList();
-        for (auto obj : objlst) {
-            std::cout << "WS_Session send:" <<info.getPayload().dump() << std::endl;
-            obj -> write(asio::buffer(info.getPayload().dump()));
-        }
-    }
-
 private:
     bool isRunning = false;
     asio::io_context& io_context;
@@ -81,6 +73,7 @@ private:
                 ws.read(buffer);
                 std::string msg = beast::buffers_to_string(buffer.data());
 
+                // TODO: all judge add into isGoodInfo()
                 // parse the json result and give the feedback.
                 try {
                     json j = json::parse(msg);
@@ -93,7 +86,8 @@ private:
 
                     // if the client use unstringified object
                     if (msg == "[object Object]") {
-                        ws.write(asio::buffer(R"({"error":"Client sent unstringified object."})"));
+                        SendInfo err_info {&ws,Responsecode::failed, "Client sent unstringified object"};
+                        send(err_info);
                     }
                 }
             }catch (const beast::system_error& e) {
@@ -129,6 +123,17 @@ private:
                 SendInfo sendInfo = sendQueue.front();
                 send(sendInfo);
                 sendQueue.pop();
+            }
+        }
+    }
+
+    static void send(SendInfo& info) {
+        auto objlst = info.getObjectList();
+        for (auto obj : objlst) {
+            try {
+                obj -> write(asio::buffer(info.getJson().dump()));
+            }catch (const std::exception& e) {
+                std::cerr << e.what() << std::endl;
             }
         }
     }

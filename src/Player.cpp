@@ -86,3 +86,14 @@ PlayerState Player::getState() const {
 websocket::stream<asio::ip::tcp::socket> * Player::getWS() const {
     return ws;
 }
+
+json Player::getPlayerJson() const {
+    json playerJson;
+    playerJson["name"] = name;
+    playerJson["id"] = id;
+    playerJson["state"] = state;
+    if (getState() == PlayerState::InRoom) {
+        playerJson["roomId"] = room->getId();
+    }
+    return playerJson;
+}
