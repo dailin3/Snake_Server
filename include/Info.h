@@ -105,11 +105,11 @@ public:
         return playerId;
     }
 
-    [[nodiscard]] websocket::stream<asio::ip::tcp::socket>* getWS() {
-        return ws;
+    [[nodiscard]] int getWSId() const {
+        return ws_id;
     }
 
-    ReceivedInfo(const json& j, websocket::stream<asio::ip::tcp::socket>* _ws) : ws(_ws) {
+    ReceivedInfo(const json& j, int _ws_id) : ws_id(_ws_id) {
         type = static_cast<InfoType>(j["type"].get<int>());
         roomId = j.value("roomId", -1);
         playerId = j.value("playerId", -1);
@@ -128,27 +128,28 @@ private:
     json rawPayload;
     GameOperationPayload gamePayload = {};
     RoomOperationPayload roomPayload = {};
-    websocket::stream<asio::ip::tcp::socket>* ws;
+    int ws_id;
 };
 
 enum class Responsecode {
     success = 1,
     failed = -1,
     update = 2,
+    gameOver = 3,
 };
 
 class SendInfo {
 public:
-    SendInfo(std::vector<websocket::stream<asio::ip::tcp::socket>*> _object_list, Responsecode _responsecode = Responsecode::success, std::string _msg = "", json data= json {})
-    : object_list(std::move(_object_list)), payload(std::move(data)), code(_responsecode), msg(std::move(_msg)) {
+    SendInfo(std::vector<int> _objectIdList, Responsecode _responsecode = Responsecode::success, std::string _msg = "", json data= json {})
+    : objectIdList(std::move(_objectIdList)), payload(std::move(data)), code(_responsecode), msg(std::move(_msg)) {
     }
-    SendInfo(websocket::stream<asio::ip::tcp::socket>* _object, Responsecode _responsecode = Responsecode::success, std::string _msg = "", json data = json {})
+    SendInfo(int _objectId, Responsecode _responsecode = Responsecode::success, std::string _msg = "", json data = json {})
     : payload(std::move(data)), code(_responsecode), msg(std::move(_msg)) {
-        object_list.push_back(_object);
+        objectIdList.push_back(_objectId);
     }
 
-    [[nodiscard]] std::vector<websocket::stream<asio::ip::tcp::socket>*> getObjectList() const {
-        return object_list;
+    [[nodiscard]] std::vector<int> getObjectIdList() const {
+        return objectIdList;
     }
     [[nodiscard]] json getPayload() const {
         return payload;
@@ -162,7 +163,7 @@ public:
         };
     }
 private:
-    std::vector<websocket::stream<asio::ip::tcp::socket>*> object_list;
+    std::vector<int> objectIdList;
     json payload;
     Responsecode code;
     std::string msg;

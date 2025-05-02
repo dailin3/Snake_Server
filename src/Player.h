@@ -21,14 +21,14 @@ class Player {
 public:
     static int maxId;
 
-    Player(const std::string &name, PlayerState state, websocket::stream<asio::ip::tcp::socket> *ws);
-    Player(const std::string &name, websocket::stream<asio::ip::tcp::socket> *ws);
+    Player(const std::string &name, PlayerState state, int ws);
+    Player(const std::string &name, int ws);
 
     [[nodiscard]] std::string getName() const;
     void setName(const std::string &name);
 
     void setState(PlayerState state);
-    void setWs(websocket::stream<asio::ip::tcp::socket> *ws);
+    void setWs(int ws);
     void setRoom(Room* room);
 
     void joinRoom(Room* room);
@@ -42,15 +42,15 @@ public:
 
     [[nodiscard]] int getId() const;
     [[nodiscard]] PlayerState getState() const;
-    [[nodiscard]] websocket::stream<asio::ip::tcp::socket> * getWS() const;
+    [[nodiscard]] int getWSId() const;
 
-    json getPlayerJson() const;
+    [[nodiscard]] json getPlayerJson() const;
 
 private:
     std::string name;
     int id;
     PlayerState state;
-    websocket::stream<asio::ip::tcp::socket>* ws;
+    int wsId;
     Room* room = nullptr;
 };
 

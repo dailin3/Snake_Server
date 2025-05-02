@@ -46,10 +46,13 @@ Player* Room::getPlayerById(int id) {
     return nullptr;
 }
 
-json Room::getGameInfo() const {
-    json gameInfo{};
-    // TODO: fill gameInfo with map and gameItems data
-    return gameInfo;
+
+int Room::getGameAllFrames() const {
+    return gameAllFrames;
+}
+
+int Room::getFreshMiliSeconds() const {
+    return freshMiliSeconds;
 }
 
 void Room::setGameThread(GameThread* gameThread) {

@@ -10,7 +10,7 @@ void GameThread::handleEachOperation(ReceivedInfo& received_info) {
     GameOperationPayload payload = received_info.getGamePayload();
     int playerId = received_info.getPlayerId();
     auto player = room->getPlayerById(playerId);
-    auto ws = received_info.getWS();
+    auto ws = received_info.getWSId();
 
     if (payload.type == GameOperationType::born) {
         room->getGameItems().addSnake(player);
@@ -23,9 +23,8 @@ void GameThread::handleEachOperation(ReceivedInfo& received_info) {
         Proxy::sendQueue.push(info);
     }
     else if (payload.type == GameOperationType::getGameInfo) {
-        json gameInfo{};
-        gameInfo = room->getGameInfo();
-        SendInfo info{ws,Responsecode::success,"",gameInfo};
+        auto gameJson = room->getGameJson();
+        SendInfo info{ws,Responsecode::success,"",gameJson};
         Proxy::sendQueue.push(info);
     }
     else {
@@ -62,8 +61,8 @@ void GameThread::bornAndDead() {
 
 void GameThread::sendResult() {
     // make ws list
-    std::vector<websocket::stream<asio::ip::tcp::socket>*> ws_list;
-    for (const auto& player : room->getPlayers()) ws_list.push_back(player->getWS());
+    std::vector<int> ws_list;
+    for (const auto& player : room->getPlayers()) ws_list.push_back(player->getWSId());
 
     //make payload
     auto gameJson = this->room->getGameJson();
@@ -73,8 +72,13 @@ void GameThread::sendResult() {
 }
 
 void GameThread::gameEnd() {
-    // TODO
+    thread.join();
+    // make ws list
+    std::vector<int> ws_list;
+    for (const auto& player : room->getPlayers()) ws_list.push_back(player->getWSId());
 
+    SendInfo send_info{ws_list, Responsecode::gameOver};
+    Proxy::sendQueue.push(send_info);
 }
 
 void GameThread::start() {
@@ -123,12 +127,12 @@ void GameThread::gameLoop() {
     while (room->getState()==RoomState::Playing) {
         gameEachLoop();
         // game end.
-        if (room->frame == 3000) {
-            room->setRoomState(RoomState::Playing);
+        if (room->frame == room->getGameAllFrames()) {
+            room->setRoomState(RoomState::Readying);
             gameEnd();
         }
         // wait for 0.1s
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(room->getFreshMiliSeconds()));
     }
 }
 

@@ -28,7 +28,7 @@ int RoomKeeper::removeRoom(int id) {
     return -1;
 }
 
-int RoomKeeper::createPlayer(const std::string& name, websocket::stream<asio::ip::tcp::socket> *ws) {
+int RoomKeeper::createPlayer(const std::string& name, int ws) {
     auto player = new Player(name, ws);
     players.push_back(player);
     return player->getId();

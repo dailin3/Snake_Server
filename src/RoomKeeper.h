@@ -56,7 +56,7 @@ public:
 
     int createRoom();
     int removeRoom(int id);
-    int createPlayer(const std::string& name, websocket::stream<asio::ip::tcp::socket> *ws);
+    int createPlayer(const std::string& name, int ws);
     int removePlayer(int id);
     int createGameThread(Room* room);
     int removeGameThread(Room* room);
@@ -90,7 +90,7 @@ private:
         if (info.getType() == InfoType::GameOperation) {
             auto roomId = info.getRoomId();
             auto room = getRoomById(roomId);
-            auto ws = info.getWS();
+            auto ws = info.getWSId();
             if (room != nullptr) {
                 room->pushOperations(info);
             }else {
@@ -103,7 +103,7 @@ private:
             auto playerId = info.getPlayerId();
             auto payload = info.getRoomPayload();
             auto type = payload.type;
-            auto ws = info.getWS();
+            auto ws = info.getWSId();
 
             // TODO: feedback
             if (type == RoomOperationType::createPlayer) {

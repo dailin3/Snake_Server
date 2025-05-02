@@ -7,13 +7,13 @@
 
 int Player::maxId = 0;
 
-Player::Player(const std::string &name, PlayerState state, websocket::stream<asio::ip::tcp::socket> *ws)
-    : name(name), state(state), ws(ws) {
+Player::Player(const std::string &name, PlayerState state, int ws)
+    : name(name), state(state), wsId(ws) {
     id = maxId++;
 }
 
-Player::Player(const std::string &name, websocket::stream<asio::ip::tcp::socket> *ws)
-    : name(name), ws(ws), state(PlayerState::Dissociated) {
+Player::Player(const std::string &name, int ws)
+    : name(name), wsId(ws), state(PlayerState::Dissociated) {
     id = maxId++;
 }
 
@@ -29,8 +29,8 @@ void Player::setState(PlayerState state) {
     this->state = state;
 }
 
-void Player::setWs(websocket::stream<asio::ip::tcp::socket> *ws) {
-    this->ws = ws;
+void Player::setWs(int ws) {
+    this->wsId = ws;
 }
 
 void Player::setRoom(Room* room) {
@@ -83,8 +83,8 @@ PlayerState Player::getState() const {
     return state;
 }
 
-websocket::stream<asio::ip::tcp::socket> * Player::getWS() const {
-    return ws;
+int Player::getWSId() const {
+    return wsId;
 }
 
 json Player::getPlayerJson() const {

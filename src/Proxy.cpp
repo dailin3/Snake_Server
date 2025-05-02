@@ -3,3 +3,5 @@
 //
 
 #include "Proxy.h"
+
+int Proxy::maxConnectionId = 0;

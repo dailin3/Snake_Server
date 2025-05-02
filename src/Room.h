@@ -32,7 +32,8 @@ public:
     [[nodiscard]] Map getMap() const;
     [[nodiscard]] std::vector<Player*> getPlayers() const;
     [[nodiscard]] Player* getPlayerById(int id);
-    [[nodiscard]] json getGameInfo() const;
+    [[nodiscard]] int getGameAllFrames() const;
+    [[nodiscard]] int getFreshMiliSeconds() const;
 
     void setGameThread(GameThread* gameThread);
     void setRoomState(RoomState roomState);
@@ -67,6 +68,8 @@ private:
     std::queue<ReceivedInfo> operationsQueue;
     GameItems gameItems;
     Map map;
+    int gameAllFrames = 3000;
+    int freshMiliSeconds = 100;
 };
 
 #endif // ROOM_H
