@@ -33,6 +33,8 @@ public:
 
     void addFood(Point point, int foodScore = 100);
 
+    void addFood(int width, int height, int foodScore = 100);
+
     // add food to a random position
     void addFood(int foodScore = 100);
 
@@ -47,6 +49,8 @@ public:
     void addBarrier(std::vector<Point> points);
 
     void removeSnakeById(int id);
+
+    void removeFoodById(int id);
 
     void drawItems();
 

@@ -15,7 +15,9 @@ Snake::Snake(GameItems *gameItems,Player* player ,std::vector<Point> points, Poi
 }
 
 void Snake::changeDirection(Direction _direction) {
-    this->direction = _direction;
+    if (validChangeDirection(_direction, this->direction)) {
+        this->direction = _direction;
+    }
 }
 
 void Snake::move() {
@@ -73,6 +75,7 @@ void Snake::grow(int length) {
     }
 
     points.insert(points.end(), addPoint); // add header to first
+    setStatus(SnakeStatus::alive);
 }
 
 void Snake::dead() {
@@ -80,37 +83,6 @@ void Snake::dead() {
         gameItems->addFood(point, 100);
     }
     gameItems->removeSnakeById(id);
-}
-
-void Snake::judge() {
-    // snake to snake
-    for (auto& snake : gameItems->getSnakes()) {
-        if (snake.get() != this) {    // if the snake is not this snake self
-            for (Point point : snake->points) {
-                if (header == point) {  // if collision happens
-                    this->setStatus(SnakeStatus::dead);
-                }
-            }
-        }
-    }
-
-    // snake to wall
-    for (auto& barrier : gameItems->getBarriers()) {
-        for (Point point : barrier->points) {
-            if (header == point) {
-                this->setStatus(SnakeStatus::dead);
-            }
-        }
-    }
-
-    // snake to food
-    for (auto& food : gameItems->getFoods()) {
-        for (Point point : food->points) {
-            if (header == point) {
-                this->setStatus(SnakeStatus::grow);
-            }
-        }
-    }
 }
 
 void Snake::react() {
@@ -126,4 +98,12 @@ Snake::SnakeStatus Snake::setStatus(const SnakeStatus status) {
 
 Player * Snake::getPlayer() const {
     return this->player;
+}
+
+Point Snake::getHeader() const {
+    return this->header;
+}
+
+bool Snake::validChangeDirection(Direction target, Direction now) {
+    return true;
 }

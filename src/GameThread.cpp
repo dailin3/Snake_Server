@@ -13,10 +13,21 @@ void GameThread::handleEachOperation(ReceivedInfo& received_info) {
     auto ws = received_info.getWSId();
 
     if (payload.type == GameOperationType::born) {
-        room->getGameItems().addSnake(player);
-        SendInfo info{ws};
-        Proxy::sendQueue.push(info);
-        std::cout << room->getGameItems().getGameItemsJson().dump();
+        bool validRequest = true;
+        for (auto snake : room->getGameItems().getSnakes()) {
+            if (snake->getPlayer()->getId() == playerId) {
+                validRequest = false;
+            }
+        }
+        if (validRequest) {
+            room->getGameItems().addSnake(player);
+            SendInfo info{ws};
+            Proxy::sendQueue.push(info);
+        }else {
+            SendInfo info{ws,Responsecode::failed,"repeated operation"};
+            Proxy::sendQueue.push(info);
+        }
+
     }else if (payload.type == GameOperationType::changeDirection) {
         auto snake = room->getGameItems().getSnakeByPlayerId(playerId);
         if (snake != nullptr) {
@@ -44,10 +55,44 @@ void GameThread::snakeMove() {
 }
 
 void GameThread::handleCollision() {
-    for (const auto& snake : room->getGameItems().getSnakes()) {
-        // TODO: not good strategy.
-        snake->judge();
+    auto& gameItems = room->getGameItems();
+    auto snakes = gameItems.getSnakes();
+    auto barriers = gameItems.getBarriers();
+    auto foods = gameItems.getFoods();
+
+    for (const auto& snake : snakes) {
+        auto header = snake->getHeader();
+        auto id = snake->id;
+
+        for (const auto& snakeitem : snakes) {
+            for (const auto& point : snakeitem->points) {
+                if (header == point && id != snakeitem->id) {
+                    snake->setStatus(Snake::SnakeStatus::dead);
+                }
+            }
+        }   // collision on snakes
+
+        for (const auto& barrieritem : barriers) {
+            for (const auto& point : barrieritem->points) {
+                if (header == point) {
+                    snake->setStatus(Snake::SnakeStatus::dead);
+                }
+            }
+        }   // collision on barriers
+
+        for (const auto& fooditem : foods) {
+            for (const auto& point : fooditem->points) {
+                if ( header == point) {
+                    snake->setStatus(Snake::SnakeStatus::grow);
+                    gameItems.removeFoodById(fooditem->id);
+                }
+            }
+        }   // collision on foods
     }
+
+
+    // update gameItems
+    room->getGameItems().update();
 }
 
 void GameThread::bornAndDead() {
@@ -56,9 +101,15 @@ void GameThread::bornAndDead() {
         snake->react();
     }
     // per 5s generate food;
-    if (room->frame % 500 == 0) {
-        room->getGameItems().addFood();
+    if (room->frame % 50 == 0) {
+        room->getGameItems().addFood(100);
     }
+    if (room->frame % 100 == 0) {
+        room->getGameItems().addFood(2,2,500);
+    }
+
+    // update gameItems
+    room->getGameItems().update();
 }
 
 
@@ -124,8 +175,6 @@ void GameThread::gameEachLoop() {
     handleCollision();
     // born and dead
     bornAndDead();
-    // update game
-    room->getGameItems().update();
     // send result to players.
     sendResult();
     // game frame ++
@@ -139,7 +188,7 @@ void GameThread::gameLoop() {
     while (room->getState()==RoomState::Playing) {
         gameEachLoop();
         // game end.
-        if (room->frame == room->getGameAllFrames()) {
+        if (room->frame >= room->getGameAllFrames()) {
             room->setRoomState(RoomState::Readying);
             gameEnd();
         }

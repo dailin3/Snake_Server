@@ -43,6 +43,11 @@ void GameItems::addFood(int foodScore) {
     foods.push_back(std::make_shared<Food>(this, points ,foodScore));
 }
 
+void GameItems::addFood(int width, int height,int foodScore) {
+    auto points =  this->map->getRandomArea(width,height);
+    foods.push_back(std::make_shared<Food>(this, points ,foodScore));
+}
+
 void GameItems::addSnake(Point point) {
     snakes.push_back(std::make_shared<Snake>(this, point));
 }
@@ -69,6 +74,15 @@ void GameItems::removeSnakeById(int id) {
     });
     if (it != snakes.end()) {
         snakes.erase(it);
+    }
+}
+
+void GameItems::removeFoodById(int id) {
+    auto it = std::find_if(foods.begin(), foods.end(), [id](const std::shared_ptr<Food>& foodPtr) {
+        return foodPtr->id == id;
+    });
+    if (it != foods.end()) {
+        foods.erase(it);
     }
 }
 

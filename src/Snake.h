@@ -12,13 +12,12 @@
 #include "Player.h"
 
 class Snake : public GameObject {
+public:
     enum class SnakeStatus {
         alive = 0,
         dead = 1,
         grow = 2,
     };
-
-public:
     Snake(GameItems* gameItems, Point point);   // just for test
     Snake(GameItems* gameItems, Player* player, std::vector<Point> points, Point header, int snakeLength, Direction direction = Direction::up);
     void changeDirection(Direction _direction);
@@ -29,6 +28,7 @@ public:
     void react();
     SnakeStatus setStatus(const SnakeStatus status);
     Player* getPlayer() const;
+    Point getHeader() const;
 
 private:
     Player* player = nullptr;
@@ -36,6 +36,7 @@ private:
     Direction direction;
     int snakeLength;
     SnakeStatus snakeStatus;
+    static bool validChangeDirection(Direction target,Direction now);
 };
 
 #endif // SNAKE_H

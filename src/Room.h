@@ -42,7 +42,7 @@ public:
     void pushOperations(const ReceivedInfo& operation);
     std::vector<ReceivedInfo> getOperationsList();
 
-    void initMap(int width = 25, int height = 25);
+    void initMap(int width = 50, int height = 50);
     void initGameItems();
     void initWall();
     void initSnake();
@@ -72,7 +72,7 @@ private:
     std::queue<ReceivedInfo> operationsQueue;
     GameItems gameItems;
     Map map;
-    int gameAllFrames = 3000;
+    int gameAllFrames = 1800;
     int freshMiliSeconds = 100;
     int ownerId = 0;
 };
