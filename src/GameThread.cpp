@@ -16,11 +16,14 @@ void GameThread::handleEachOperation(ReceivedInfo& received_info) {
         room->getGameItems().addSnake(player);
         SendInfo info{ws};
         Proxy::sendQueue.push(info);
+        std::cout << room->getGameItems().getGameItemsJson().dump();
     }else if (payload.type == GameOperationType::changeDirection) {
         auto snake = room->getGameItems().getSnakeByPlayerId(playerId);
-        snake->changeDirection(payload.newDirection);
-        SendInfo info{ws};
-        Proxy::sendQueue.push(info);
+        if (snake != nullptr) {
+            snake->changeDirection(payload.newDirection);
+            SendInfo info{ws};
+            Proxy::sendQueue.push(info);
+        }
     }
     else if (payload.type == GameOperationType::getGameInfo) {
         auto gameJson = room->getGameJson();
@@ -72,13 +75,13 @@ void GameThread::sendResult() {
 }
 
 void GameThread::gameEnd() {
-    thread.join();
     // make ws list
     std::vector<int> ws_list;
     for (const auto& player : room->getPlayers()) ws_list.push_back(player->getWSId());
 
     SendInfo send_info{ws_list, Responsecode::gameOver};
     Proxy::sendQueue.push(send_info);
+    std::cout << "Game End" << std::endl;
 }
 
 void GameThread::start() {

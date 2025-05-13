@@ -103,15 +103,15 @@ nlohmann::json Map::getMapJson() const {
     nlohmann::json j;
     j["width"] = width;
     j["height"] = height;
-
     nlohmann::json mapJson = nlohmann::json::array();
-    for (const auto& row : map) {
+    for (int y = 0; y < height; ++y) {
         nlohmann::json rowJson = nlohmann::json::array();
-        for (const auto cell : row) {
+        for (int x = 0; x < width; ++x) {
+            auto cell = map[x][y];
             if (cell) {
                 rowJson.push_back(cell->to_json());
             } else {
-                rowJson.push_back(nullptr);
+                throw("error");
             }
         }
         mapJson.push_back(rowJson);

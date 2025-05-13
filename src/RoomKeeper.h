@@ -85,7 +85,6 @@ private:
 
 
     void _infoHandler(ReceivedInfo& info) {
-        std::cout << "RoomKeeper::infoHandler Recieved:"<< info.getRawPayload().dump() <<std::endl;
         // dispatch game logic.
         if (info.getType() == InfoType::GameOperation) {
             auto roomId = info.getRoomId();
@@ -110,12 +109,12 @@ private:
                 int id = createPlayer(payload.name,ws);
                 if (id != -1) {
                     json data {
-                        {"plyerId",id}
+                        {"playerId",id}
                     };
                     SendInfo res{ws,Responsecode::success,"",data};
                     Proxy::sendQueue.push(res);
                 }else {
-                    SendInfo err_info{ws,Responsecode::failed};
+                    SendInfo err_info{ws,Responsecode::failed,"cannot create player(maybe name conflict)"};
                     Proxy::sendQueue.push(err_info);
                 }
 
@@ -125,7 +124,7 @@ private:
                     SendInfo res{ws};
                     Proxy::sendQueue.push(res);
                 }else {
-                    SendInfo err_info{ws,Responsecode::failed};
+                    SendInfo err_info{ws,Responsecode::failed, "cannot remove player with id " + std::to_string(playerId)};
                     Proxy::sendQueue.push(err_info);
                 }
 
@@ -138,7 +137,7 @@ private:
                     SendInfo res{ws};
                     Proxy::sendQueue.push(res);
                 }else {
-                    SendInfo err_info{ws,Responsecode::failed};
+                    SendInfo err_info{ws,Responsecode::failed, "cannot join room with id " + std::to_string(roomId)};
                     Proxy::sendQueue.push(err_info);
                 }
 
@@ -150,7 +149,7 @@ private:
                     SendInfo res{ws};
                     Proxy::sendQueue.push(res);
                 }else {
-                    SendInfo err_info{ws,Responsecode::failed};
+                    SendInfo err_info{ws,Responsecode::failed, "cannot leave room with id " + std::to_string(roomId)};
                     Proxy::sendQueue.push(err_info);
                 }
 
@@ -161,7 +160,7 @@ private:
                     SendInfo res{ws};
                     Proxy::sendQueue.push(res);
                 }else {
-                    SendInfo err_info{ws,Responsecode::failed};
+                    SendInfo err_info{ws,Responsecode::failed, "cannot ready room"};
                     Proxy::sendQueue.push(err_info);
                 }
 
@@ -183,7 +182,7 @@ private:
                 auto code = bind(player, room);
                 if (code == 1) {
                     json data = {
-                    {"id",id}
+                    {"roomId",id}
                     };
                     SendInfo res{ws,Responsecode::success,"",data};
                     Proxy::sendQueue.push(res);

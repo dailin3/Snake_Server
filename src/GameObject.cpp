@@ -9,8 +9,8 @@ int GameObject::maxId = 0;
 
 Point::Point(const int _x, const int _y) : x(_x), y(_y) {}
 
-Point Point::up() const { return Point(x, y+1); }
-Point Point::down() const { return Point(x, y-1); }
+Point Point::up() const { return Point(x, y-1); }
+Point Point::down() const { return Point(x, y+1); }
 Point Point::left() const { return Point(x-1, y); }
 Point Point::right() const { return Point(x+1, y); }
 

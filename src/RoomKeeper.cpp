@@ -104,7 +104,11 @@ int RoomKeeper::stopGame(Room *room, Player* player) {
 }
 
 int RoomKeeper::readyForGame( Player *player) {
-    return player->ready();
+    if (player != nullptr) {
+        return player->ready();
+    }else {
+        return -1;
+    }
 }
 
 int RoomKeeper::unreadyForGame( Player *player) {

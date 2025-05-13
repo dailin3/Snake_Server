@@ -172,6 +172,7 @@ private:
                 auto obj = getConnnection(objId);
                 if (obj != nullptr) {
                     obj -> write(asio::buffer(info.getJson().dump()));
+                    // std::cout << "Send Info:" << info.getJson().dump() << std::endl;
                 }
             }catch (const beast::system_error& e) {
                 if (e.code() == websocket::error::closed || e.code () == asio::error::operation_aborted || e.code() == boost::asio::error::eof) {

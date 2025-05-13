@@ -25,7 +25,7 @@ GameThread* Room::getGameThread() const {
     return gameThread;
 }
 
-GameItems Room::getGameItems() const {
+GameItems& Room::getGameItems() {
     return gameItems;
 }
 
@@ -159,9 +159,14 @@ std::vector<json> Room::getPlayersJson() const {
     return playersJson;
 }
 
+int Room::getOwnerId() const {
+    return players.front()->getId();
+}
+
 json Room::getRoomJson() const {
     json roomJson{};
-    roomJson["id"] = roomId;
+    roomJson["roomId"] = roomId;
+    roomJson["ownerId"] = getOwnerId();
     roomJson["state"] = state;
     roomJson["players"] = getPlayersJson();
     return roomJson;

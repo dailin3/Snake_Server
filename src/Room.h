@@ -28,7 +28,7 @@ public:
     [[nodiscard]] int getId() const;
     [[nodiscard]] RoomState getState() const;
     [[nodiscard]] GameThread* getGameThread() const;
-    [[nodiscard]] GameItems getGameItems() const;
+    [[nodiscard]] GameItems& getGameItems();
     [[nodiscard]] Map getMap() const;
     [[nodiscard]] std::vector<Player*> getPlayers() const;
     [[nodiscard]] Player* getPlayerById(int id);
@@ -59,6 +59,8 @@ public:
 
     [[nodiscard]] std::vector<json> getPlayersJson() const;
 
+    int getOwnerId() const;
+
 private:
     static int maxRoomId;
     int roomId;
@@ -68,8 +70,9 @@ private:
     std::queue<ReceivedInfo> operationsQueue;
     GameItems gameItems;
     Map map;
-    int gameAllFrames = 3000;
+    int gameAllFrames = 100;
     int freshMiliSeconds = 100;
+    int ownerId = 0;
 };
 
 #endif // ROOM_H
