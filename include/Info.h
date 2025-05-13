@@ -10,7 +10,7 @@
 #include <nlohmann/json.hpp>
 #include <utility>
 
-#include "../src/GameObject.h"
+#include "GameObject.h"
 
 namespace asio = boost::asio;
 namespace websocket = boost::beast::websocket;

@@ -1,19 +1,10 @@
-#include "main.h"
-#include "Map.h"
-#include "Snake.h"
-#include "GameItems.h"
-#include "Player.h"
-
-#include <iostream>
-
-#include "GameThread.h"
-#include "Room.h"
+#include "Proxy.h"
 #include "RoomKeeper.h"
 
 int main() {
     // test Proxy
     asio::io_context io;
-    Proxy proxy{io,1145};
+    Proxy proxy{io,9999};
     //std::thread proxyThread(&Proxy::begin, &proxy);
     //proxy.start();
 

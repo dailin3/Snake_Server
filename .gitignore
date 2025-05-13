@@ -4,4 +4,10 @@ thirdparty
 
 .idea
 
+.vscode
+
 .DS_Store
+
+build
+
+bin

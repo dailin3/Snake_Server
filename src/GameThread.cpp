@@ -123,8 +123,6 @@ void GameThread::sendResult() {
     // send info
     SendInfo send_info{ws_list,Responsecode::update,"",gameJson};
     Proxy::sendQueue.push(send_info);
-
-    std::cout << room->getMap().toString()<<std::endl;
 }
 
 void GameThread::gameEnd() {
