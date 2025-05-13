@@ -52,6 +52,8 @@ public:
 
     void update();
 
+    void clear();
+
     [[nodiscard]] json getGameItemsJson() const;
 
 private:

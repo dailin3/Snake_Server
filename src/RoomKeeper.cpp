@@ -79,7 +79,8 @@ int RoomKeeper::bind(Room *room, GameThread *thread) {
 }
 
 int RoomKeeper::unbind(Player *player, Room *room) {
-    if (room != nullptr && player != nullptr && player->getState() == PlayerState::Dissociated) {
+    if (room != nullptr && player != nullptr && player->getState() == PlayerState::InRoom) {
+        player->setState(PlayerState::Dissociated);
         player->setRoom(nullptr);
         room->removePlayer(player);
         return 1;

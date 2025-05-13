@@ -92,6 +92,12 @@ void GameItems::update() {
     drawItems();
 }
 
+void GameItems::clear() {
+    snakes.clear();
+    foods.clear();
+    barriers.clear();
+}
+
 json GameItems::getGameItemsJson() const {
     auto snake_array = json::array();
     auto food_array = json::array();

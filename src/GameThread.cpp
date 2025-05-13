@@ -72,19 +72,28 @@ void GameThread::sendResult() {
     // send info
     SendInfo send_info{ws_list,Responsecode::update,"",gameJson};
     Proxy::sendQueue.push(send_info);
+
+    std::cout << room->getMap().toString()<<std::endl;
 }
 
 void GameThread::gameEnd() {
     // make ws list
     std::vector<int> ws_list;
-    for (const auto& player : room->getPlayers()) ws_list.push_back(player->getWSId());
+    for (const auto& player : room->getPlayers()) {
+        ws_list.push_back(player->getWSId());
+    };
 
     SendInfo send_info{ws_list, Responsecode::gameOver};
     Proxy::sendQueue.push(send_info);
     std::cout << "Game End" << std::endl;
+
+    room->clearRoom();
 }
 
 void GameThread::start() {
+    if (thread.joinable()) {
+        thread.join();
+    }
     thread = std::thread(&GameThread::gameLoop, this);
 }
 

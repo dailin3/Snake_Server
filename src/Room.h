@@ -51,6 +51,8 @@ public:
     int stopGame(Player* player);
     void overGame();
 
+    void clearRoom();
+
     int frame = 0;
 
     [[nodiscard]] json getRoomJson() const;
@@ -70,7 +72,7 @@ private:
     std::queue<ReceivedInfo> operationsQueue;
     GameItems gameItems;
     Map map;
-    int gameAllFrames = 100;
+    int gameAllFrames = 3000;
     int freshMiliSeconds = 100;
     int ownerId = 0;
 };

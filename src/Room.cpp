@@ -139,6 +139,15 @@ void Room::overGame() {
     }
 }
 
+void Room::clearRoom() {
+    frame = 0;
+    for (Player* player : players) {
+        player->overGame();
+    }
+    map.clearMap();
+    gameItems.clear();
+}
+
 json Room::getGameJson() const {
     json gameJson{};
     gameJson["frame"] = frame;
