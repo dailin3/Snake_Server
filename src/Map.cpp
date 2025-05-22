@@ -69,6 +69,7 @@ void Map::clearMap() {
 
 void Map::drawObj(const std::shared_ptr<GameObject>& obj) {
     for (const auto p : obj->points) {
+        if (p.x >= width || p.y >= height) return;  // TODO: add log to record!
         map[p.x][p.y]->addObject(obj);
     }
 }

@@ -31,6 +31,9 @@ public:
     static std::queue<ReceivedInfo> receivedQueue;
     static std::queue<SendInfo> sendQueue;
 
+    static void safePush(SendInfo& info);
+    static ReceivedInfo safePop();
+
     explicit Proxy(asio::io_context& io_context, unsigned short port);
     ~Proxy();
 

@@ -7,9 +7,23 @@
 int Proxy::maxConnectionId = 0;
 std::queue<ReceivedInfo> Proxy::receivedQueue;
 std::queue<SendInfo> Proxy::sendQueue;
+static std::mutex sendQueueMutex;
+static std::mutex receivedQueueMutex;
+
+void Proxy::safePush(SendInfo &info){
+    std::lock_guard<std::mutex> lock(sendQueueMutex);
+    sendQueue.push(info);
+}
+
+ReceivedInfo Proxy::safePop(){
+    std::lock_guard<std::mutex> lock(sendQueueMutex);
+    auto info = Proxy::receivedQueue.front();
+    Proxy::receivedQueue.pop();
+    return info;
+}
 
 
-Proxy::Proxy(asio::io_context& io_context, unsigned short port)
+Proxy::Proxy(asio::io_context &io_context, unsigned short port)
     : io_context(io_context), port(port), acceptor(nullptr) {}
 
 Proxy::~Proxy() {
@@ -130,14 +144,17 @@ void Proxy::acceptfunction() {
 
 void Proxy::sendfunction() {
     while (isRunning) {
-        if (!sendQueue.empty()) {
-            try{
-                auto sendInfo = sendQueue.front();
-                send(sendInfo);
-                sendQueue.pop();
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            }catch (const std::exception& e) {
-                std::cerr << "send error: " << e.what() << std::endl;
+        SendInfo sendInfo;
+        {
+            // 使用RAII锁保护队列访�?
+            std::lock_guard<std::mutex> lock(sendQueueMutex);
+            if (!sendQueue.empty()) {
+                std::vector<SendInfo> sendList;
+                while (!sendQueue.empty()) {
+                    sendInfo = sendQueue.front();
+                    sendQueue.pop();
+                    send(sendInfo);
+                }
             }
         }
     }

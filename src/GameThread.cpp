@@ -22,10 +22,10 @@ void GameThread::handleEachOperation(ReceivedInfo& received_info) {
         if (validRequest) {
             room->getGameItems().addSnake(player);
             SendInfo info{ws};
-            Proxy::sendQueue.push(info);
+            Proxy::safePush(info);
         }else {
             SendInfo info{ws,Responsecode::failed,"repeated operation"};
-            Proxy::sendQueue.push(info);
+            Proxy::safePush(info);
         }
 
     }else if (payload.type == GameOperationType::changeDirection) {
@@ -33,18 +33,18 @@ void GameThread::handleEachOperation(ReceivedInfo& received_info) {
         if (snake != nullptr) {
             snake->changeDirection(payload.newDirection);
             SendInfo info{ws};
-            Proxy::sendQueue.push(info);
+            Proxy::safePush(info);
         }
     }
     else if (payload.type == GameOperationType::getGameInfo) {
         auto gameJson = room->getGameJson();
         SendInfo info{ws,Responsecode::success,"",gameJson};
-        Proxy::sendQueue.push(info);
+        Proxy::safePush(info);
     }
     else {
         std::cout<< "RoomKeeper error unknown type : " <<static_cast<int>(payload.type) << std::endl;
         SendInfo err_info{ws,Responsecode::failed,"Unknown type"};
-        Proxy::sendQueue.push(err_info);
+        Proxy::safePush(err_info);
     }
 }
 
@@ -122,7 +122,7 @@ void GameThread::sendResult() {
     auto gameJson = this->room->getGameJson();
     // send info
     SendInfo send_info{ws_list,Responsecode::update,"",gameJson};
-    Proxy::sendQueue.push(send_info);
+    Proxy::safePush(send_info);
 }
 
 void GameThread::gameEnd() {
@@ -133,7 +133,7 @@ void GameThread::gameEnd() {
     };
 
     SendInfo send_info{ws_list, Responsecode::gameOver};
-    Proxy::sendQueue.push(send_info);
+    Proxy::safePush(send_info);
     std::cout << "Game End" << std::endl;
 
     room->clearRoom();

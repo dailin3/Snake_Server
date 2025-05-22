@@ -143,7 +143,7 @@ public:
     SendInfo(std::vector<int> _objectIdList, Responsecode _responsecode = Responsecode::success, std::string _msg = "", json data= json {})
     : objectIdList(std::move(_objectIdList)), payload(std::move(data)), code(_responsecode), msg(std::move(_msg)) {
     }
-    SendInfo(int _objectId, Responsecode _responsecode = Responsecode::success, std::string _msg = "", json data = json {})
+    SendInfo(int _objectId = -1, Responsecode _responsecode = Responsecode::success, std::string _msg = "", json data = json {})
     : payload(std::move(data)), code(_responsecode), msg(std::move(_msg)) {
         objectIdList.push_back(_objectId);
     }

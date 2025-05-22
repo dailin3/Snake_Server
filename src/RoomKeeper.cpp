@@ -14,9 +14,8 @@ void RoomKeeper::runningLoop() {
     while (isRunning) {
         // dispatch info
         if (!Proxy::receivedQueue.empty()) {
-            auto info = Proxy::receivedQueue.front();
+            auto info = Proxy::safePop();
             _infoHandler(info);
-            Proxy::receivedQueue.pop();
         }
 
         // clear empty room
@@ -188,7 +187,7 @@ void RoomKeeper::_infoHandler(ReceivedInfo& info) {
             room->pushOperations(info);
         }else {
             SendInfo err_info{ws,Responsecode::failed,"Cannot find room with id " + std::to_string(roomId)};
-            Proxy::sendQueue.push(err_info);
+            Proxy::safePush(err_info);
         }
         //handle room logic
     }else if (info.getType() == InfoType::RoomOperation) {
@@ -206,20 +205,20 @@ void RoomKeeper::_infoHandler(ReceivedInfo& info) {
                     {"playerId",id}
                 };
                 SendInfo res{ws,Responsecode::success,"",data};
-                Proxy::sendQueue.push(res);
+                Proxy::safePush(res);
             }else {
                 SendInfo err_info{ws,Responsecode::failed,"cannot create player(maybe name conflict)"};
-                Proxy::sendQueue.push(err_info);
+                Proxy::safePush(err_info);
             }
 
         }else if (type == RoomOperationType::removePlayer) {
             int code = removePlayer(playerId);
             if (code == 1) {
                 SendInfo res{ws};
-                Proxy::sendQueue.push(res);
+                Proxy::safePush(res);
             }else {
                 SendInfo err_info{ws,Responsecode::failed, "cannot remove player with id " + std::to_string(playerId)};
-                Proxy::sendQueue.push(err_info);
+                Proxy::safePush(err_info);
             }
 
 
@@ -229,10 +228,10 @@ void RoomKeeper::_infoHandler(ReceivedInfo& info) {
             int code = bind(player, room);
             if (code == 1) {
                 SendInfo res{ws};
-                Proxy::sendQueue.push(res);
+                Proxy::safePush(res);
             }else {
                 SendInfo err_info{ws,Responsecode::failed, "cannot join room with id " + std::to_string(roomId)};
-                Proxy::sendQueue.push(err_info);
+                Proxy::safePush(err_info);
             }
 
         }else if (type == RoomOperationType::leaveRoom) {
@@ -241,10 +240,10 @@ void RoomKeeper::_infoHandler(ReceivedInfo& info) {
             int code = unbind(player, room);
             if (code == 1) {
                 SendInfo res{ws};
-                Proxy::sendQueue.push(res);
+                Proxy::safePush(res);
             }else {
                 SendInfo err_info{ws,Responsecode::failed, "cannot leave room with id " + std::to_string(roomId)};
-                Proxy::sendQueue.push(err_info);
+                Proxy::safePush(err_info);
             }
 
         }else if (type == RoomOperationType::readyRoom) {
@@ -252,10 +251,10 @@ void RoomKeeper::_infoHandler(ReceivedInfo& info) {
             auto code = readyForGame(player);
             if (code == 1) {
                 SendInfo res{ws};
-                Proxy::sendQueue.push(res);
+                Proxy::safePush(res);
             }else {
                 SendInfo err_info{ws,Responsecode::failed, "cannot ready room"};
-                Proxy::sendQueue.push(err_info);
+                Proxy::safePush(err_info);
             }
 
         }else if (type == RoomOperationType::unreadyRoom) {
@@ -263,10 +262,10 @@ void RoomKeeper::_infoHandler(ReceivedInfo& info) {
             auto code = unreadyForGame(player);
             if (code == 1) {
                 SendInfo res{ws};
-                Proxy::sendQueue.push(res);
+                Proxy::safePush(res);
             }else {
                 SendInfo err_info{ws,Responsecode::failed};
-                Proxy::sendQueue.push(err_info);
+                Proxy::safePush(err_info);
             }
 
         }else if (type == RoomOperationType::createRoom) {
@@ -279,10 +278,10 @@ void RoomKeeper::_infoHandler(ReceivedInfo& info) {
                 {"roomId",id}
                 };
                 SendInfo res{ws,Responsecode::success,"",data};
-                Proxy::sendQueue.push(res);
+                Proxy::safePush(res);
             }else {
                 SendInfo err_info{ws,Responsecode::failed};
-                Proxy::sendQueue.push(err_info);
+                Proxy::safePush(err_info);
             }
 
         }
@@ -293,10 +292,10 @@ void RoomKeeper::_infoHandler(ReceivedInfo& info) {
                 auto code = startGame(room, player);
                 if (code == 1) {
                     SendInfo res{ws};
-                    Proxy::sendQueue.push(res);
+                    Proxy::safePush(res);
                 }else {
                     SendInfo err_info{ws,Responsecode::failed};
-                    Proxy::sendQueue.push(err_info);
+                    Proxy::safePush(err_info);
                 }
             }
 
@@ -305,16 +304,16 @@ void RoomKeeper::_infoHandler(ReceivedInfo& info) {
 
             if (room != nullptr) {
                 SendInfo res{ws,Responsecode::success,"",room->getRoomJson()};
-                Proxy::sendQueue.push(res);
+                Proxy::safePush(res);
             }else {
                 SendInfo err_info{ws,Responsecode::failed};
-                Proxy::sendQueue.push(err_info);
+                Proxy::safePush(err_info);
             }
 
         }else if (type == RoomOperationType::roomKeeperInfo) {
             auto data = getRoomKeeperJson();
             SendInfo res{ws,Responsecode::success,"",data};
-            Proxy::sendQueue.push(res);
+            Proxy::safePush(res);
 
 
         }else if (type == RoomOperationType::playerInfo) {
@@ -322,16 +321,16 @@ void RoomKeeper::_infoHandler(ReceivedInfo& info) {
 
             if (player != nullptr) {
                 SendInfo res{ws,Responsecode::success,"",player->getPlayerJson()};
-                Proxy::sendQueue.push(res);
+                Proxy::safePush(res);
             }else {
                 SendInfo err_info{ws,Responsecode::failed};
-                Proxy::sendQueue.push(err_info);
+                Proxy::safePush(err_info);
             }
 
         }else {
             std::cout<< "RoomKeeper error unknown type : " <<static_cast<int>(type) << std::endl;
             SendInfo err_info{ws,Responsecode::failed,"Unknown type"};
-            Proxy::sendQueue.push(err_info);
+            Proxy::safePush(err_info);
         }
     }
 }
