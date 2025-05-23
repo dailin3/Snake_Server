@@ -41,7 +41,7 @@ public:
     void stop();
 
 private:
-    bool isRunning = false;
+    volatile bool isRunning = false;
     asio::io_context& io_context;
     std::unique_ptr<asio::ip::tcp::acceptor> acceptor;
     const unsigned short port;

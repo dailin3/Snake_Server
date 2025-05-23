@@ -31,13 +31,21 @@ Proxy::~Proxy() {
 }
 
 void Proxy::start() {
-    if (!isRunning) {
-        isRunning = true;
-        acceptor = std::make_unique<asio::ip::tcp::acceptor>(
-            io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port));
-        acceptThread = std::thread(&Proxy::acceptfunction, this);
-        sendThread = std::thread(&Proxy::sendfunction, this);
-        std::cout << "Proxy started at port: " << port << std::endl;
+    try {
+        if (!isRunning) {
+            acceptor = std::make_unique<asio::ip::tcp::acceptor>(
+                io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port));
+            acceptThread = std::thread(&Proxy::acceptfunction, this);
+            sendThread = std::thread(&Proxy::sendfunction, this);
+            isRunning = true;
+            std::cout << "Proxy started at port: " << port << std::endl;
+        }
+    }catch (const beast::system_error& e) {
+        throw std::runtime_error("Proxy could not start due to port already in use");
+    }
+    catch (std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        std::cerr << typeid(e).name() << std::endl;
     }
 }
 
@@ -146,8 +154,7 @@ void Proxy::sendfunction() {
     while (isRunning) {
         SendInfo sendInfo;
         {
-            // 使用RAII锁保护队列访�?
-            std::lock_guard<std::mutex> lock(sendQueueMutex);
+            std::lock_guard lock(sendQueueMutex);
             if (!sendQueue.empty()) {
                 std::vector<SendInfo> sendList;
                 while (!sendQueue.empty()) {
